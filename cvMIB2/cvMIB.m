@@ -12,9 +12,9 @@ try
     
     ListenChar(2);
 
-    openTask; % general rig specific
-    cvMIB_params;    % Load the parameters
-    cvMIB_opentask;  % Open the task
+    openTask; % general function
+    cvMIB2_params;    % Load the parameters
+    cvMIB2_opentask;  % Open the task
     
     % Run the task
     while trialnum < ntrials && continue_running
@@ -29,7 +29,7 @@ try
         
     end
     
-    closeTask; % general rig specific function
+    closeTask; % general but rig specific function
     
     ListenChar(0);               
     

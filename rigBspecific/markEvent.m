@@ -1,4 +1,3 @@
-% then the trappings of a function
 function timeStamp = markEvent(event,screenFlip,pulseWidth)
 % markEvent sends the DIO command and gets the time stamp of the event
 %   specified by input "event"

@@ -7,7 +7,7 @@ ntrials = 200;
 p_probe = 0.1;
 
 % Directory of where the data will be saved to
-dataDirectory = 'C:\Users\User\Documents\MATLAB\Becket\cvMIB\data';
+dataDirectory = 'C:\Users\User\Documents\MATLAB\Becket\cvMIB2\data';
 
 % Timing window parameters (s)
 time2fix = 2;
