@@ -1,6 +1,6 @@
 ./*/data
 .DS_Store
-.asv
+*.asv
 .Rhistory
 .DS_Store?
 ._*
