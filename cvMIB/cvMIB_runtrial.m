@@ -75,7 +75,7 @@ try
         while ((GetSecs - targOn) < showTime) && ~choiceMade
             
             if fixed % keep fixation on the screen until time
-                moveGabors;
+                moveGaborsCV;
                 sampleEye;
                 esc_check;
                 fixed = checkFix(origin, fix_err, space);
@@ -118,7 +118,7 @@ try
                 error_made = 1;
                 errortype = 5;  % broke targ fixation
             else
-                %moveGabors;
+                %moveGaborsCV;
                 sampleEye;
                 esc_check;
             end
