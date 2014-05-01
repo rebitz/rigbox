@@ -17,7 +17,46 @@ else
     TESTING = 0;
 end
 
-% initialize eye
+%% setup and begin to fill the global environmental variables
+% does the dio in defaultEnv 
+
+global env w
+defaultEnv;
+
+%% Initialize screen and keyboard fns
+
+Screen('CloseAll'); % Screen clear
+warning('off','MATLAB:dispatcher:InexactMatch');
+warning('off','MATLAB:dispatcher:InexactCaseMatch');
+Screen('Preference','VisualDebugLevel', 0);
+Screen('Preference', 'SuppressAllWarnings', 1);
+Screen('Preference', 'SkipSyncTests',1);
+
+% Create new window and record size
+[w, rect] = Screen('OpenWindow',env.screenNumber,env.colorDepth/2); % window Idx
+[env.screenWidth, env.screenHeight] = WindowSize(w);
+
+% Reseed random
+RandStream.setGlobalStream(RandStream('mt19937ar','seed',sum(100*clock)));
+rng('shuffle');
+
+% Switch KbName into unified mode: It will use the names of the OS-X
+% platform on all platforms in order to make this script portable:
+KbName('UnifyKeyNames');
+space = KbName('SPACE');
+esc = KbName('ESCAPE');
+right = KbName('RightArrow');
+left = KbName('LeftArrow');
+up = KbName('UpArrow');
+down = KbName('DownArrow');
+shift = KbName('RightShift');
+stopkey = KbName('ESCAPE');
+juicekey = KbName('j');
+
+% Define origin of screen
+origin = [(rect(3) - rect(1))/2 (rect(4) - rect(2))/2];
+
+%% initialize eye
 % Connection with Eyelink if not in testing mode
 if EYEBALL
     try       
@@ -64,46 +103,6 @@ if EYEBALL
     end
 end
 
-
-%% setup and begin to fill the global environmental variables
-% does the dio in defaultEnv 
-
-global env w
-defaultEnv;
-
-%% Initialize screen and keyboard fns
-
-Screen('CloseAll'); % Screen clear
-warning('off','MATLAB:dispatcher:InexactMatch');
-warning('off','MATLAB:dispatcher:InexactCaseMatch');
-Screen('Preference','VisualDebugLevel', 0);
-Screen('Preference', 'SuppressAllWarnings', 1);
-Screen('Preference', 'SkipSyncTests',1);
-
-% Create new window and record size
-[w, rect] = Screen('OpenWindow',env.screenNumber,env.colorDepth/2); % window Idx
-[env.screenWidth, env.screenHeight] = WindowSize(w);
-
-% Reseed random
-RandStream.setGlobalStream(RandStream('mt19937ar','seed',sum(100*clock)));
-rng('shuffle');
-
-% Switch KbName into unified mode: It will use the names of the OS-X
-% platform on all platforms in order to make this script portable:
-KbName('UnifyKeyNames');
-space = KbName('SPACE');
-esc = KbName('ESCAPE');
-right = KbName('RightArrow');
-left = KbName('LeftArrow');
-up = KbName('UpArrow');
-down = KbName('DownArrow');
-shift = KbName('RightShift');
-stopkey = KbName('ESCAPE');
-juicekey = KbName('j');
-
-% Define origin of screen
-origin = [(rect(3) - rect(1))/2 (rect(4) - rect(2))/2];
-
 %% feedback stuff:
 
 errorSize = 8;
@@ -125,3 +124,8 @@ continue_running = 1;
 
 % set a default wait time if waiting for text needs to happen
 waitForText = 1.5;
+
+
+%% get full pathdef of data directory since we'll be moving around a lot
+cd(dataDirectory);
+dataDirectory = pwd;

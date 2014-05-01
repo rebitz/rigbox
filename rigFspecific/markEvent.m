@@ -9,6 +9,13 @@ function timeStamp = markEvent(event,screenFlip,pulseWidth)
 %   [timeStamp] = markEvent(1) % open first 
 %
 
+if nargin < 2
+    screenFlip = 0; % default to no flippage
+end
+if nargin < 3
+    pulseWidth = NaN;
+end
+
 global w
 
 % get timestamp from flip command

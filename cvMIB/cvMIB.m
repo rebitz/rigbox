@@ -12,9 +12,9 @@ try
     
     ListenChar(2);
 
-    openTask; % general rig specific
     cvMIB_params;    % Load the parameters
-    cvMIB_opentask;  % Open the task
+    openTask; % general rig specific
+    cvMIB_opentask;  % specific open task func
     
     % Run the task
     while trialnum < ntrials && continue_running
@@ -34,11 +34,10 @@ try
     ListenChar(0);               
     
 catch
-    
+    ListenChar(0);
     sca;
     commandwindow;
     rethrow(lasterror);
-    q = lasterror
-    ListenChar(0);
+    q = lasterror;
     
 end
