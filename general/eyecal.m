@@ -6,13 +6,14 @@ if nargin<1
 end
 
 setupDIO;
+defaultEnv;
 global env const
 env.allDIOclosed = flags;
 env.nports = nports;
 env.digOut = digOut;
 
 % Define some basic constants:
-const.monkeyScreen = 2;
+const.monkeyScreen = env.screenNumber;
 const.interTrial = 1; % In seconds
 stimOnTime = 60000; % very long is the point
 const.bgColor = [127 127 127];
@@ -29,9 +30,9 @@ if ~Eyelink('IsConnected')
 end
 
 % Set up the canvas:
-[window, screenRect] = Screen('OpenWindow', ...
+[w, screenRect] = Screen('OpenWindow', ...
     const.monkeyScreen, const.bgColor, [], 32);
-const.w = window;
+const.w = w;
 const.screenRect = screenRect;
 HideCursor;
 blankScreen = Screen('OpenOffscreenWindow', ...
@@ -74,8 +75,8 @@ fixRect2 = fixRect2(:)';
 % %Initalize juice delivery system
 
 % Sync with the screen(?)
-Screen('CopyWindow',blankScreen,window,screenRect,screenRect);
-Screen('Flip',window);
+Screen('CopyWindow',blankScreen,w,screenRect,screenRect);
+Screen('Flip',w);
 
 sharedWorkspace EYECAL -clear
 sharedWorkspace('EYECAL', 'keepGoing', true);
@@ -91,8 +92,8 @@ sleepWithKbCheck(const.interTrial,keyHandlers);
 %while continueRunning
 while sharedWorkspace('EYECAL','keepGoing')
     % Clear the screen:
-    Screen('CopyWindow', blankScreen, window, screenRect, screenRect);
-    Screen('Flip', window);
+    Screen('CopyWindow', blankScreen, w, screenRect, screenRect);
+    Screen('Flip', w);
     
     trialNum = trialNum+1;
     % Determine where Eyelink expects the target to appear:
@@ -101,8 +102,8 @@ while sharedWorkspace('EYECAL','keepGoing')
     targRect = targRect(:)'; const.targRect = targRect;
    
     % draw target spot:
-    Screen('FillRect', window, const.targColor, targRect);
-    Screen('Flip', window);
+    Screen('FillRect', w, const.targColor, targRect);
+    Screen('Flip', w);
     sharedWorkspace('EYECAL', 'stimOn', true);
     fprintf(strcat('\n targ',num2str(trialNum),'on'))
 
@@ -114,8 +115,8 @@ while sharedWorkspace('EYECAL','keepGoing')
     end
        
     % Clear the screen:
-    Screen('CopyWindow', blankScreen, window, screenRect, screenRect);
-    Screen('Flip', window);
+    Screen('CopyWindow', blankScreen, w, screenRect, screenRect);
+    Screen('Flip', w);
     % Wait the intertrial interval:
     sleepWithKbCheck(const.interTrial,keyHandlers);
     if ~sharedWorkspace('EYECAL','keepGoing');
