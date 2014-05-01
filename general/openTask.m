@@ -17,6 +17,8 @@ else
     TESTING = 0;
 end
 
+ListenChar(2);
+
 %% setup and begin to fill the global environmental variables
 % does the dio in defaultEnv 
 

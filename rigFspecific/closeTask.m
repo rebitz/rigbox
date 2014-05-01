@@ -13,6 +13,8 @@ if EYEBALL
 
 end
 
+ListenChar(0);
+
 % Clear and back to command line
 sca;
 commandwindow;

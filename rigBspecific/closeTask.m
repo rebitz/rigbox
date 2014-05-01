@@ -13,6 +13,9 @@ if EYEBALL
 
 end
 
+% keyboard on
+ListenChar(0);
+
 % close the DIO
 closeDIO;
 
