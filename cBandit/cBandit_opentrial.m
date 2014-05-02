@@ -50,6 +50,7 @@ samples = NaN(sample_size,1);
 trialnum = trialnum + 1;
 
 % Increment rewards
+if rwds.counter == 0; rwds.counter = 1; end
 t1Rwd = rwds.t1Rwd(rwds.counter); 
 t2Rwd = rwds.t2Rwd(rwds.counter);
 

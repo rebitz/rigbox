@@ -1,4 +1,7 @@
 ./*/data
+./*/data/*
+.\*\data
+.\*\data\*
 .DS_Store
 *.asv
 .Rhistory

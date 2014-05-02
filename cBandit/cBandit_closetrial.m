@@ -86,7 +86,7 @@ save(strcat(filename, zpad, num2str(trialnum)), 'trial_data');
 if correct == 1
     rwds.counter = rwds.counter+1;
     cd .. % go up a step
-    save(rwds,'rwds');
+    save(rwdvar,'rwds');
 end
 
 % Cleanup screen

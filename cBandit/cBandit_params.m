@@ -7,7 +7,13 @@ ntrials = 200;
 p_probe = 0.9; % p(2 targ choice)
 
 % Directory of where the data will be saved to
-dataDirectory = './cBandit/data';
+global gitDir
+if IsOSX
+    splitChar = '/';
+else
+    splitChar = '\';
+end
+dataDirectory = strcat(gitDir,splitChar,'cBandit',splitChar,'data');
 
 % Timing window parameters (s)
 time2fix = 2;

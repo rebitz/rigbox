@@ -7,7 +7,14 @@ ntrials = 200;
 p_probe = 0.1;
 
 % Directory of where the data will be saved to
-dataDirectory = '.\cvMIB\data';
+global gitDir
+if IsOSX
+    splitChar = '/';
+else
+    splitChar = '\';
+end
+dataDirectory = strcat(gitDir,splitChar,'cvMIB',splitChar,'data');
+
 
 % Timing window parameters (s)
 time2fix = 2;
