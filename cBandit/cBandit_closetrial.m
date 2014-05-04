@@ -29,7 +29,7 @@ trial_data.rewarded = rewarded;
 trial_data.targ = curTarg;
 trial_data.condition = curTargLoc; % actually target position
 
-try,
+try
     trial_data.theta = theta(curTargLoc);
 catch
     trial_data.theta = NaN;
@@ -48,6 +48,11 @@ trial_data.t2Rwd = t2Rwd; % t1
 trial_data.targ2theta = t2Loc;
 trial_data.dir2 = dir2;
 trial_data.targ2origin = t2origin;
+
+if probe
+    fprintf('\n T1 = %d, T2 = %d, chose %d, rwd = %d \n',...
+        t1Rwd,t2Rwd,choice,rewarded);
+end
 
 trial_data.error = error_made;
 trial_data.errortype = errortype;

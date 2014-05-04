@@ -26,8 +26,8 @@ fixSize = .5; % in dg
 fix_err = 3; % in dg
 
 % Inter-trial interval bounds (s)
-itimin = .5;
-itimax = 1;
+itimin = 1;
+itimax = 1.5;
 
 % target locations
 %
@@ -52,9 +52,9 @@ color2 = [1/9 5/9 7/9];
 colors = [color1; color2];
 
 % Reward parameters are actually set in open task
-walkRewards = 1; % else just deliver at lower and upper bounds
-rwdLB = 10; % if ~walkRewards, just assigns to these
-rwdUB = 90; %
+walkRewards = 0; % else just deliver at lower and upper bounds
+rwdLB = 20; % lower bound, if ~walkRewards, just assigns to these
+rwdUB = 80; % % upper bound
 hazard = 0.15; % p(step), size fixed at 10%
 nToGen = 2000; % length of vector to generate
 

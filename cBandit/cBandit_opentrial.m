@@ -60,8 +60,7 @@ if ~probe
     if rand < p_move
 
         allTargs = [1 2];
-        otherTargLocs = allTargs(allTargs ~= curTargLoc);
-        curTargLoc = otherTargLocs(randi(2));
+        curTargLoc = allTargs(allTargs ~= curTargLoc);
         curTargOri = targOrigins(curTargLoc, :);
         curTargBox = targBoxes(curTargLoc, :);
         curTargKey = targKeys(curTargLoc);
@@ -85,7 +84,7 @@ if ~probe
 elseif probe
     % first assign colors
     allTargs = [1 2];
-    allTargs = Shuffle(allTargs);
+    % allTargs = Shuffle(allTargs); <--badness
     t1id = allTargs(1);
     t2id = allTargs(2);
 %     t1Rwd = t1Rwd;

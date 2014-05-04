@@ -86,16 +86,17 @@ try
                     Screen(w,'FillRect',env.colorDepth/2,fixRect)
                     fixoff = Screen(w,'Flip');
                 end
+            % mapped to physical locations of the targets ??
             elseif checkFix(t1origin, targ_err, left);
                 targAcq = GetSecs;
                 choice = 1;
                 choiceMade = 1;
-                curTargKey = left; curTargOri = t1origin
+                curTargKey = left; curTargOri = t1origin;
             elseif checkFix(t2origin, targ_err, right);
                 targAcq = GetSecs;
                 choice = 2;
                 choiceMade = 1;
-                curTargKey = right; curTargOri = t2origin
+                curTargKey = right; curTargOri = t2origin;
             end
         end
         
