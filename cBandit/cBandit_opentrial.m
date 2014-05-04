@@ -50,6 +50,7 @@ samples = NaN(sample_size,1);
 trialnum = trialnum + 1;
 
 % Increment rewards
+if rwds.counter == 0; rwds.counter = 1; end
 t1Rwd = rwds.t1Rwd(rwds.counter); 
 t2Rwd = rwds.t2Rwd(rwds.counter);
 
@@ -59,8 +60,7 @@ if ~probe
     if rand < p_move
 
         allTargs = [1 2];
-        otherTargLocs = allTargs(allTargs ~= curTargLoc);
-        curTargLoc = otherTargLocs(randi(2));
+        curTargLoc = allTargs(allTargs ~= curTargLoc);
         curTargOri = targOrigins(curTargLoc, :);
         curTargBox = targBoxes(curTargLoc, :);
         curTargKey = targKeys(curTargLoc);
@@ -84,7 +84,7 @@ if ~probe
 elseif probe
     % first assign colors
     allTargs = [1 2];
-    allTargs = Shuffle(allTargs);
+    % allTargs = Shuffle(allTargs); <--badness
     t1id = allTargs(1);
     t2id = allTargs(2);
 %     t1Rwd = t1Rwd;

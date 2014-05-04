@@ -79,7 +79,7 @@ if ~probe
 elseif probe
     % first assign colors
     allTargs = [1 2 3];
-    allTargs = Shuffle(allTargs);
+    %allTargs = Shuffle(allTargs);
     t1id = allTargs(1);
     t2id = allTargs(2);
     t1Rwd = rwds(t1id); t2Rwd = rwds(t2id);

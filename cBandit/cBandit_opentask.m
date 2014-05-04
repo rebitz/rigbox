@@ -7,7 +7,7 @@ iti = itimin + ((itimax - itimin) .* rand(1,1));
 
 % reset rewards count for the current block
 rewards = 0;
-correctTrials = 0;
+correctTrials = 1;
 
 % target keys
 targKeys = [up left right];
@@ -41,6 +41,7 @@ files = {files([files.isdir]==1).name};
 
 % initialize colors for saving
 colorvar = strcat(filestart,'_colors');
+rwdvar = strcat(filestart,'_rwds');
 
 if sum(strcmp(files,filestart))<1 % but if we're wrong
     % this is the case of a whole new file
@@ -73,10 +74,10 @@ cd(dataDirectory)
 
 if trueFirst
     save(colorvar,'colors'); % save the colors if we just generated them
-    save(rwds,'rwds');
+    save(rwdvar,'rwds');
 else
     load(colorvar); % load the colors if this is a repeated block
-    load(rwds); % also the reward vector w/ correct trial counter
+    load(rwdvar); % also the reward vector w/ correct trial counter
 end
 
 zpad = '_00';
@@ -145,7 +146,7 @@ errorSize = deg2px(fixSize, env)./2;
 errorRect = [origin origin] + [-errorSize -errorSize errorSize errorSize];
 
 %% Assign initial targ location
-curTargLoc = randi(length(thetas));
+curTargLoc = randi(length(theta));
 curTargOri = targOrigins(curTargLoc, :);
 curTargBox = targBoxes(curTargLoc, :);
 curTargKey = targKeys(curTargLoc);
@@ -221,7 +222,6 @@ task_data.targHoldTime = targHoldTime;
 task_data.targ_err = targ_err;
 task_data.t1origin = t1origin;
 task_data.t2origin = t2origin;
-task_data.t3origin = t3origin;
 
 task_data.rwds = rwds;
 
