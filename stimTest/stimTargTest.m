@@ -1,4 +1,4 @@
-function stimTargTest(filename,location,depth,targLoc)
+function stimTargTest(filename,targLoc,location,depth)
 %
 % put up a target stimulus and run some stim pulses right before the targ
 % -- idea is to see if target PLR is modulated by FEF stim
@@ -9,14 +9,19 @@ function stimTargTest(filename,location,depth,targLoc)
 % fixation appear - after that it should progress automatically
 
 % first parse inputs
-if nargin < 3 % if nothing provided
+if nargin < 4 % if nothing provided
     disp('No depth provided')
     depth = NaN;
 end
 
-if nargin < 2 % if nothing provided
+if nargin < 3 % if nothing provided
     disp('No recording site provided')
     location = NaN;
+end
+
+if nargin < 3 % if nothing provided
+    disp('No target location provided, using horizontal meridian, 10 deg')
+    targLoc = [0 10]
 end
 
 if nargin < 1
@@ -38,6 +43,8 @@ fixErr = 3;
 fixColor = repmat(max(env.colorDepth),1,3); % bright fix
 minFixed = .4; % min time to hold fix
 maxFixed = .6; % max time to hold fix
+minITI = 1.5; % min time to hold fix
+maxITI = 2; % max time to hold fix
 time2choose = 1; % time to saccade to target
 
 targSize = 3;
@@ -94,6 +101,7 @@ while continueRun
     
     % pick hold time for this trial
     holdTime = rand*(maxFixed-minFixed)+minFixed;
+    itiTime = rand*(maxITI-minITI)+minITI;
     
     % query the user for current stim information if it's changing
     if changingStimParams
@@ -101,9 +109,8 @@ while continueRun
         if ~continueRun; break; end
     end
 
-    disp('ready for fixation, press "space" to display');
-    waiting = 1;
-    while waiting
+    trialStart = GetSecs;
+    while (GetSecs - trialStart) < itiTime
         escStimCheck;
         sampleEye;
     end
@@ -175,6 +182,7 @@ while continueRun
     trials(tNum).duration = duration;
 
     % timing, from matlab
+    trials(tNum).itiTime = itiTime;
     trials(tNum).fixOn = fixOnT;
     trials(tNum).fixAcq = fixAcq;
     trials(tNum).fixHoldTime = holdTime;
@@ -189,7 +197,7 @@ while continueRun
     
     % outcome information
     trials(tNum).error = errorMade;
-    trials(tnum).juiceT = juiceT;
+    trials(tNum).juiceT = juiceT;
     
     % eye data
     trials(tNum).eyedata = samples;
@@ -234,16 +242,18 @@ function setupStimDio % subfunction to open the stimulator
     global dio;
 
     % DEV1 should be our PCI 6251
-    if strcmp(devices(1).Model,'PCI-6251')
+    if strcmp(devices(1).Model,'PCI-6251') || strcmp(devices(1).Model,'PCIe-6361')
         dio = daq.createSession('ni');  % specify # of lines on port 0
+        
+        devStr = devices(1).ID;
         
         % juice port
         portStr = strcat('port',num2str(env.juicePort),'/line',num2str(env.juiceCh));
-        dio.addDigitalChannel('Dev1',portStr,'OutputOnly') %0:3 is #1-4
+        dio.addDigitalChannel(devStr,portStr,'OutputOnly') %0:3 is #1-4
         
         % microstim port
         portStr = strcat('port',num2str(env.stimPort),'/line',num2str(env.stimCh));
-        dio.addDigitalChannel('Dev1',portStr,'OutputOnly') %0:3 is #1-4
+        dio.addDigitalChannel(devStr,portStr,'OutputOnly') %0:3 is #1-4
     else
         fprintf('\n Error, wrong device ID entered \n')
         dio = [];
@@ -485,6 +495,21 @@ function fixed = checkFix(object, err)
             end
         end
     end
+end
+
+function defaultEnv
+    % Setup the environment struct - used by many task functions
+    env.screenNumber = 2;
+    env.resolution = Screen('Resolution',env.screenNumber);
+    env.width = env.resolution.width;
+    env.distance = 34; % in cm, monkey from screen
+    env.physicalWidth = 40; % in cm, width of the visible screen
+    env.colorDepth = 255;
+    env.stimPort = 0; % port for microstim
+    env.stimCh = 1; % channel for microstimulation
+    env.juicePort = 0; % port for microstim
+    env.juiceCh = 0; % channel for microstimulation
+    env.rigID = 'RigB'; %
 end
 
 end

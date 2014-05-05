@@ -47,14 +47,16 @@ showTime = 2; % duration stim are on for - REMOVE ME
 targ_err = 15; % in dg
 
 % Target colors
-color1 = [2/3 4/9 0];
-color2 = [1/9 5/9 7/9];
+% color1 = [2/3 4/9 0];
+% color2 = [1/9 5/9 7/9];
+color1 = [0 4/9 1]; % orange/blue
+color2 = [7/9 2/9 7/9]; % pink/green
 colors = [color1; color2];
 
 % Reward parameters are actually set in open task
 walkRewards = 0; % else just deliver at lower and upper bounds
-rwdLB = 20; % lower bound, if ~walkRewards, just assigns to these
-rwdUB = 80; % % upper bound
+rwdLB = 10; % lower bound, if ~walkRewards, just assigns to these
+rwdUB = 90; % % upper bound
 hazard = 0.15; % p(step), size fixed at 10%
 nToGen = 2000; % length of vector to generate
 
