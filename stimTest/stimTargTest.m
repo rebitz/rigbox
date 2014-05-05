@@ -1,9 +1,12 @@
-function stimTest(filename,location,depth);
+function stimTargTest(filename,location,depth,targLoc)
 %
-% put up a fixation cross and run some stim pulses
-% -- plot the output by default to see the saccades generated
-% -- returns mean endpoint location of stimulated saccades [th,rho]
+% put up a target stimulus and run some stim pulses right before the targ
+% -- idea is to see if target PLR is modulated by FEF stim
 % takes inputs filename, location of hole, depth (from brain 0)
+%   also targLoc - which should be [theta, ecc], in deg;
+%
+% there is no ITI here - you have to press space to make the initial
+% fixation appear - after that it should progress automatically
 
 % first parse inputs
 if nargin < 3 % if nothing provided
@@ -20,27 +23,38 @@ if nargin < 1
     disp('No filename provided, using test.mat')
     filename = 'test';
 end
-filename = strcat(filename,'FIXSTIM',datestr(now,'mmddyy_HHMM'));
+filename = strcat(filename,'TARGSTIM',datestr(now,'mmddyy_HHMM'));
 
-% make a default environment!!!
+% make the default environment
 global env; defaultEnv;
 
-% set defaults
+% set parameters
+changingStimParams = 0; % 0 = use info provided at start of run
+nTrials = 100;
+pStimTrial = 0.7;
+
 fixSize = 0.5;
-fixErr = 2;
+fixErr = 3;
 fixColor = repmat(max(env.colorDepth),1,3); % bright fix
-bgColor = repmat(max(env.colorDepth)/3,1,3); % dark bg
+minFixed = .4; % min time to hold fix
+maxFixed = .6; % max time to hold fix
+time2choose = 1; % time to saccade to target
+
+targSize = 3;
+targErr = 10;
+targColor = repmat(max(env.colorDepth),1,3);
+targInLoc = targLoc;
+targOutLoc = [targLoc(1)+180 targLoc(2)]; % opposing side
+bgColor = repmat(max(env.colorDepth)/4,1,3); % dark bg for pupil size
+
 current = 50; % default, in muA
 duration = 100; % default, in ms
-fixOnTrue = 1; % default to on
+% fixOnTrue = 1; % default to on
 postStimTime = 2; % how long to collect eye data after stimulation onset
 EYEBALL = 1;
 
-% for plotting:
-colors = colormap('jet');
-colorStep = 8;
-preWindow = 0.1; %preWindow = preWindow*1000;
-postWindow = 0.5; %postWindow = postWindow*1000;
+% timestamps that may not be accessed = NaNs
+[fixOnT,fixAcq,stimOn,screenClearT,targOnT,juiceT] = deal(NaN);
 
 % initialize vars
 tNum = 1;
@@ -55,18 +69,37 @@ disp('dio open');
 global samples;
 samples = NaN(31,1);
 
+% start by asking the user what to do;
+if ~changingStimParams
+    queryUser;
+end
+
 while continueRun
 
-    % plotting color for this trial
-    if tNum*3 < length(colors)
-        trialColor = colors(tNum*colorStep,:);
-    else
-        trialColor = colors(tNum*colorStep-length(colors),:);
+    % initialize some trial by trial parameters
+    % pick which target to show
+    targIn = Shuffle([0 1]);
+    if targIn(1) == 1
+        targIn = 1;
+        targRect = t1Rect;
+        targOrigin = t1origin;
+    elseif targIn(1) == 0
+        targIn = 0;
+        targRect = t0Rect;
+        targOrigin = t0origin;
     end
     
-    % query the user for current stim information
-    queryUser;
-    if ~continueRun; break; end
+    % stim or no stim trial?
+    stimTrial = convertProb(pStimTrial); stimTrial = stimTrial(1);
+    
+    % pick hold time for this trial
+    holdTime = rand*(maxFixed-minFixed)+minFixed;
+    
+    % query the user for current stim information if it's changing
+    if changingStimParams
+        queryUser;
+        if ~continueRun; break; end
+    end
 
     disp('ready for fixation, press "space" to display');
     waiting = 1;
@@ -76,58 +109,59 @@ while continueRun
     end
     if ~continueRun; break; end
     
-    if fixOnTrue
-        % Fixation onset
-        Screen(w,'FillRect',fixColor,fixRect)
-        fixOnT = Screen(w,'Flip');
-        
-        fixed = 0; waiting = 1;
-        while ~fixed && waiting
-            fixed = checkFix(origin, fixErr);
-            sampleEye;
-            escStimCheck;
-        end
-        disp('fixation acquired; press "t" for stim')
-    else
-        fixOnT = GetSecs();
-        fixed = 1;
+    % Fixation onset
+    Screen(w,'FillRect',fixColor,fixRect)
+    fixOnT = Screen(w,'Flip');
+
+    fixed = 0; errorMade = 0; waiting = 1;
+    while ~fixed && waiting
+        fixed = checkFix(origin, fixErr);
+        sampleEye;
+        escStimCheck;
     end
+    disp('fixation acquired; waiting for stim and targ')
     
-    % wait for user-inputted stimulation go time
-    stimGo = 0;
-    while ~stimGo && continueRun
+    % wait for fixation hold time for stimulation go time
+    fixAcq = GetSecs;
+    while (GetSecs - fixAcq) < holdTime && fixed && continueRun
+        fixed = checkFix(origin, fixErr);
         escStimCheck;
         sampleEye;
-    end
+    end % can shortcircuit this with stim key
     if ~continueRun; break; end
+    if ~fixed; errorMade = 1; end
     
-%     % get pre-stim eyetracker tstamp
-%     if EYEBALL
-%         r = Eyelink('RequestTime');
-%         if r == 0
-%             preEyeTime = Eyelink('ReadTime');
-%         end
-%     end
-    
-    % do stim
-    stimPulse;
-    disp('stim delivered, collecting eyedata');
-    
-%     % get post-stim timestamp from eyetracker
-%     if EYEBALL
-%         r = Eyelink('RequestTime');
-%         if r == 0
-%             postEyeTime = Eyelink('ReadTime');
-%         end
-%     end
+    if ~errorMade;        
+        % and it's a stim trial, do stim
+        if stimTrial
+            stimPulse;
+            disp('stim delivered, collecting eyedata');
+        end
 
+        % do target onset
+        Screen(w,'FillRect',targColor,targRect)
+        targOnT = Screen(w,'Flip');
+
+        % check for eye position within the target
+        targAcq = 0;
+        while (GetSecs - targOnT) < time2choose && ~targAcq
+            targAcq = checkFix(targOrigin, targErr);
+        end
+        if ~targAcq; errorMade = 1; end
+    end
+    
+    if ~errorMade
+        juiceT = giveJuice();
+        
+    end
+    
     % clear the screen
     Screen(w,'FillRect',bgColor)
     screenClearT = Screen(w,'Flip');
-    
+
     % wait a respectable period & collect eye data
     while (GetSecs() - stimOn) < postStimTime
-        % escStimCheck; % no option to escape this - prime data collection!
+        escStimCheck; % mostly to check for juicing
         sampleEye;
     end
     
@@ -135,15 +169,28 @@ while continueRun
     trials(tNum).location = location;
     trials(tNum).depth = depth;
     
+    % stimulation parameters
+    trials(tNum).stimTrial = stimTrial; % logical
     trials(tNum).current = current;
     trials(tNum).duration = duration;
-    trials(tNum).fixOnTrue = fixOnTrue;
 
     % timing, from matlab
-    trials(tNum).fixOnTime = fixOnT;
+    trials(tNum).fixOn = fixOnT;
+    trials(tNum).fixAcq = fixAcq;
+    trials(tNum).fixHoldTime = holdTime;
     trials(tNum).stimOnTime = stimOn;
     trials(tNum).fixOffTime = screenClearT;
 
+    % target information
+    trials(tNum).targOn = targOnT;
+    trials(tNum).targInLoc = targInLoc;
+    trials(tNum).targOutLoc = targOutLoc;
+    trials(tNum).targInLogical = targIn;
+    
+    % outcome information
+    trials(tNum).error = errorMade;
+    trials(tnum).juiceT = juiceT;
+    
     % eye data
     trials(tNum).eyedata = samples;
 
@@ -162,53 +209,13 @@ while continueRun
         % would make legit time = (eyeTimestamp/1000)+offset
     end
     
-    % then plots
-    preT = stimOn-preWindow;
-    postT = stimOn+postWindow;
-    % convert eyetracker stamps to matlab time
-    tstamps = (samples(1,:)/1000)+trials(tNum).trackerOffset;
-    idx = and(tstamps > preT, tstamps < postT);
-    tstamps = tstamps(idx);
-    xPos = samples(14,idx);
-    yPos = samples(16,idx);
-    pulse = zeros(1,length(tstamps)); % make a cartoon pulse of when stim was on
-    idx = and(tstamps >= stimOn, tstamps <= stimOn+(duration./1000));
-    pulse(idx) = deal(current);
-    tFromStim = tstamps - min(tstamps);
-    
-    % then plotting
-    figure(99);
-    subplot(6,1,1); hold on; % pulse
-    plot(tFromStim,pulse,'Color',trialColor);
-    ylabel('stim pulse (cartoon)');
-    
-    subplot(6,1,2); hold on; % x pos
-    plot(tFromStim,xPos-nanmean(xPos(1:preWindow*1000)),'Color',trialColor);
-    ylabel('x position (px)');
-    
-    subplot(6,1,3); hold on; % y pos
-    plot(tFromStim,yPos-nanmean(yPos(1:preWindow*1000)),'Color',trialColor);
-    ylabel('y position (px)');
-    
-    subplot(6,1,4:6); hold on;
-    plot(xPos-nanmean(xPos(1:preWindow*1000)),...
-        yPos-nanmean(yPos(1:preWindow*1000)),'Color',trialColor);
-    xlabel('xpos (px)'); ylabel('ypos (px)');
-    xlim([-env.screenWidth/2 env.screenWidth/2]);
-    ylim([-env.screenHeight/2 env.screenHeight/2]);
-    
-    % append plot info to trial struct
-%    trials(tNum).preEyeTime = preEyeTime;
-%    trials(tNum).postEyeTime = postEyeTime;
-    trials(tNum).x = xPos;
-    trials(tNum).y = yPos;
-    trials(tNum).tstamps = tstamps;
-    trials(tNum).pulse = pulse;
-    
-    
     % setup the next trial
     tNum = tNum+1;
+    if tNum > nTrials; continueRun = 0; end % or don't
+    
+    % vars that may not be accessed = NaNs
     samples = NaN(size(samples,1),1);
+    [fixOnT,fixAcq,stimOn,screenClearT,targOnT,juiceT] = deal(NaN);
  
 end
 
@@ -256,7 +263,7 @@ function stimPulse % send a pulse to open the stim
     dio.outputSingleScan([0 0]);
 end
 
-function giveJuice % send a pulse to open the stim
+function timeStamp = giveJuice % send a pulse to open the stim
     global dio
     dio.outputSingleScan([1 0]);
     % get timestamp
@@ -336,12 +343,29 @@ function prepareEnv
         end
     end
     
-    % Setup stimuli and fixation rects
+    % Setup fixation rects
     fixSize = deg2px(fixSize, env)./2;
     fixRect = [origin origin] + [-fixSize -fixSize fixSize fixSize];
     fixErr = deg2px(fixErr, env)./2;
+    
+    % Setup target rects
+    [t1x, t1y] = pol2cart(deg2rad(targInLoc(1)),deg2px(targInLoc(2), env));
+    [t0x, t0y] = pol2cart(deg2rad(targOutLoc(1)),deg2px(targOutLoc(2), env));
+    targSize = deg2px(targSize, env)./2;
+    t1origin = [t1x,t1y]+origin;
+    t1Rect = [t1origin t1origin] + [-targSize -targSize targSize targSize];
+    t0origin = [t0x,t0y]+origin;
+    t0Rect = [t0origin t0origin] + [-targSize -targSize targSize targSize];
+    targErr = deg2px(targErr, env)./2;
 
-    env.dataDir = 'C:\Users\User\Documents\MATLAB\Becket\stimTest\data';
+    global gitDir
+    if IsOSX
+        splitChar = '/';
+    else
+        splitChar = '\';
+    end
+    dataDirectory = strcat(gitDir,splitChar,'stimTest',splitChar,'data');
+    env.dataDir = dataDirectory;
     
     % setup keyboard
     if ~exist('stopkey') % set defaults in case not set above
@@ -362,9 +386,9 @@ function prepareEnv
 end
 
 function queryUser
-    promt = {'current:','duration','fixation displayed?'};
+    promt = {'current:','duration'};
     nLines = 1;
-    def = {num2str(current),num2str(duration),'y'};
+    def = {num2str(current),num2str(duration)};
     tmp = inputdlg(promt,'test',nLines,def);
     
     if isempty(tmp) % cancel was pressed
@@ -384,16 +408,6 @@ function queryUser
             duration = duration; % assume no change if no info provided
         else
             duration = durIn;
-        end
-        
-        fixIn = tmp{3};
-        if isempty(fixIn);
-            fprintf('\n no answer given, default to showing fixation \n');
-            fixOnTrue = 1; % default to fix on
-        elseif ~isempty(strfind(fixIn,'y'));
-            fixOnTrue = 1; % on
-        else
-            fixOnTrue = 0; % off
         end
     end
 end
