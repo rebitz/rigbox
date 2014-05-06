@@ -227,16 +227,18 @@ function setupStimDio % subfunction to open the stimulator
     global dio;
 
     % DEV1 should be our PCI 6251
-    if strcmp(devices(1).Model,'PCI-6251')
+    if strcmp(devices(1).Model,'PCI-6251') || strcmp(devices(1).Model,'PCIe-6361')
         dio = daq.createSession('ni');  % specify # of lines on port 0
+        
+        devStr = devices(1).ID;
         
         % juice port
         portStr = strcat('port',num2str(env.juicePort),'/line',num2str(env.juiceCh));
-        dio.addDigitalChannel('Dev1',portStr,'OutputOnly') %0:3 is #1-4
+        dio.addDigitalChannel(devStr,portStr,'OutputOnly') %0:3 is #1-4
         
         % microstim port
         portStr = strcat('port',num2str(env.stimPort),'/line',num2str(env.stimCh));
-        dio.addDigitalChannel('Dev1',portStr,'OutputOnly') %0:3 is #1-4
+        dio.addDigitalChannel(devStr,portStr,'OutputOnly') %0:3 is #1-4
     else
         fprintf('\n Error, wrong device ID entered \n')
         dio = [];
@@ -269,7 +271,7 @@ end
 function prepareEnv
     % setup plotting window for us
     h = figure(99); clf; hold on;
-    set(gcf, 'Position', [360 49 609 841]);
+    set(gcf, 'Position', [50 49 409 841]);
     
     Screen('CloseAll'); % Screen clear
     warning('off','MATLAB:dispatcher:InexactMatch');
@@ -341,7 +343,7 @@ function prepareEnv
     fixRect = [origin origin] + [-fixSize -fixSize fixSize fixSize];
     fixErr = deg2px(fixErr, env)./2;
 
-    env.dataDir = 'C:\Users\User\Documents\MATLAB\Becket\stimTest\data';
+    env.dataDir = 'C:\Users\User\Documents\GitHub\rigbox\stimTest\data';
     
     % setup keyboard
     if ~exist('stopkey') % set defaults in case not set above
@@ -471,6 +473,21 @@ function fixed = checkFix(object, err)
             end
         end
     end
+end
+
+function defaultEnv
+    % Setup the environment struct - used by many task functions
+    env.screenNumber = 2;
+    env.resolution = Screen('Resolution',env.screenNumber);
+    env.width = env.resolution.width;
+    env.distance = 34; % in cm, monkey from screen
+    env.physicalWidth = 40; % in cm, width of the visible screen
+    env.colorDepth = 255;
+    env.stimPort = 0; % port for microstim
+    env.stimCh = 1; % channel for microstimulation
+    env.juicePort = 0; % port for microstim
+    env.juiceCh = 0; % channel for microstimulation
+    env.rigID = 'RigB'; %
 end
 
 end

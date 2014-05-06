@@ -25,6 +25,7 @@ if t_lastFrame > flip_time % time to put up a new frame
         Screen('DrawTexture', w, textureIdx,[],t2Rect);
     end
     
+    Screen(w,'FillRect',fixcolor,fixRect); % to keep fix on screen
     lasttime = Screen('Flip',w,[],1);
     
     % Increment flip & save presentation times
