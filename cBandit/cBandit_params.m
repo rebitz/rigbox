@@ -2,7 +2,7 @@
 % Initialize the parameters for vMIB task
 
 % Number of trials
-ntrials = 200;
+ntrials = 100;
 
 p_probe = 0.9; % p(2 targ choice)
 
@@ -23,7 +23,7 @@ targHoldTime = .20;
 % Fixation parameters
 fixcolor = [255 255 255];
 fixSize = .5; % in dg
-fix_err = 3; % in dg
+fix_err = 4; % in dg
 
 % Inter-trial interval bounds (s)
 itimin = 1;
