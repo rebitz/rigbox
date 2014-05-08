@@ -46,6 +46,8 @@ maxFixed = .6; % max time to hold fix
 minITI = 1.5; % min time to hold fix
 maxITI = 2; % max time to hold fix
 time2choose = 1; % time to saccade to target
+time2fix = 1; % time to hold fixation after target
+saccadeMode = 0; % 1 = saccade to target, 0 = hold fixation
 
 targSize = 3;
 targErr = 10;
@@ -149,14 +151,25 @@ while continueRun
         Screen(w,'FillRect',targColor,targRect)
         targOnT = Screen(w,'Flip');
 
-        % check for eye position within the target
-        targAcq = 0;
-        while (GetSecs - targOnT) < time2choose && ~targAcq
-            targAcq = checkFix(targOrigin, targErr);
+        if saccadeMode
+            % check for eye position within the target
+            targAcq = 0;
+            while (GetSecs - targOnT) < time2choose && ~targAcq
+                targAcq = checkFix(targOrigin, targErr);
+                sampleEye;
+            end
+            if ~targAcq; errorMade = 1; end
+        else
+            % check for eye position within the fixation
+            while (GetSecs - targOnT) < time2fix && fixed
+                fixed = checkFix(origin, fixErr);
+                sampleEye;
+            end
+            if ~fixed; errorMade = 1; end
         end
-        if ~targAcq; errorMade = 1; end
+
     end
-    
+
     if ~errorMade
         juiceT = giveJuice();
         
