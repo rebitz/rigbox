@@ -111,7 +111,7 @@ elseif probe
     
     if rand < .5;
         dir2 = 'CCW';
-        t1Mov = flipud(t1Mov);
+        t2Mov = flipud(t2Mov);
     else
         dir2 = 'CW';
     end
