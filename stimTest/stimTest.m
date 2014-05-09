@@ -30,7 +30,7 @@ fixSize = 0.5;
 fixErr = 2;
 fixColor = repmat(max(env.colorDepth),1,3); % bright fix
 bgColor = repmat(max(env.colorDepth)/3,1,3); % dark bg
-current = 50; % default, in muA
+voltage = 50; % default, in muA
 duration = 100; % default, in ms
 fixOnTrue = 1; % default to on
 postStimTime = 2; % how long to collect eye data after stimulation onset
@@ -135,7 +135,7 @@ while continueRun
     trials(tNum).location = location;
     trials(tNum).depth = depth;
     
-    trials(tNum).current = current;
+    trials(tNum).voltage = voltage;
     trials(tNum).duration = duration;
     trials(tNum).fixOnTrue = fixOnTrue;
 
@@ -173,7 +173,7 @@ while continueRun
     yPos = samples(16,idx);
     pulse = zeros(1,length(tstamps)); % make a cartoon pulse of when stim was on
     idx = and(tstamps >= stimOn, tstamps <= stimOn+(duration./1000));
-    pulse(idx) = deal(current);
+    pulse(idx) = deal(voltage);
     tFromStim = tstamps - min(tstamps);
     
     % then plotting
@@ -364,9 +364,9 @@ function prepareEnv
 end
 
 function queryUser
-    promt = {'current:','duration','fixation displayed?'};
+    promt = {'voltage:','duration','fixation displayed?'};
     nLines = 1;
-    def = {num2str(current),num2str(duration),'y'};
+    def = {num2str(voltage),num2str(duration),'y'};
     tmp = inputdlg(promt,'test',nLines,def);
     
     if isempty(tmp) % cancel was pressed
@@ -374,10 +374,10 @@ function queryUser
     else
         curIn = str2num(tmp{1});
         if isempty(curIn);
-            fprintf('\n no current given, recording %0g mA \n',current);
-            current = current; % assume no change if no info provided
+            fprintf('\n no voltage given, recording %0g mV \n',voltage);
+            voltage = voltage; % assume no change if no info provided
         else
-            current = curIn;
+            voltage = curIn;
         end
         
         durIn = str2num(tmp{2});

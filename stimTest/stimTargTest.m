@@ -47,7 +47,7 @@ minITI = 1.5; % min time to hold fix
 maxITI = 2; % max time to hold fix
 time2choose = 1; % time to saccade to target
 time2fix = 1; % time to hold fixation after target
-saccadeMode = 0; % 1 = saccade to target, 0 = hold fixation
+saccadeMode = 0; % type of trials to run, 1 = saccade to target, 0 = hold fixation
 
 targSize = 3;
 targErr = 10;
@@ -56,7 +56,7 @@ targInLoc = targLoc;
 targOutLoc = [targLoc(1)+180 targLoc(2)]; % opposing side
 bgColor = repmat(max(env.colorDepth)/4,1,3); % dark bg for pupil size
 
-current = 50; % default, in muA
+voltage = 50; % default, in muA
 duration = 100; % default, in ms
 % fixOnTrue = 1; % default to on
 postStimTime = 2; % how long to collect eye data after stimulation onset
@@ -191,7 +191,7 @@ while continueRun
     
     % stimulation parameters
     trials(tNum).stimTrial = stimTrial; % logical
-    trials(tNum).current = current;
+    trials(tNum).voltage = voltage;
     trials(tNum).duration = duration;
 
     % timing, from matlab
@@ -409,9 +409,9 @@ function prepareEnv
 end
 
 function queryUser
-    promt = {'current:','duration'};
+    promt = {'voltage:','duration'};
     nLines = 1;
-    def = {num2str(current),num2str(duration)};
+    def = {num2str(voltage),num2str(duration)};
     tmp = inputdlg(promt,'test',nLines,def);
     
     if isempty(tmp) % cancel was pressed
@@ -419,10 +419,10 @@ function queryUser
     else
         curIn = str2num(tmp{1});
         if isempty(curIn);
-            fprintf('\n no current given, recording %0g mA \n',current);
-            current = current; % assume no change if no info provided
+            fprintf('\n no voltage given, recording %0g mV \n',voltage);
+            voltage = voltage; % assume no change if no info provided
         else
-            current = curIn;
+            voltage = curIn;
         end
         
         durIn = str2num(tmp{2});
