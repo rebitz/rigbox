@@ -61,7 +61,7 @@ try
     sampleEye;
     
     if ~error_made % Display MIB targ
-        
+        fixStillOn = 1;
         targOn = GetSecs;
         
         lasttime = targOn; % time of pervious frame for targets
@@ -71,7 +71,7 @@ try
         out = []; % targ output params (to save)
         
         % do the overlap period
-        while ((GetSecs - fixacq) < overlap) && ~error_made
+        while ((GetSecs - targOn) < overlap) && ~error_made
             fixed = checkFix(origin, fix_err, space);
             if fixed
                 moveGaborsBandit;
@@ -87,8 +87,9 @@ try
     if ~error_made
         
         % Fixation offset == go cue
-        Screen(w,'FillRect',env.colorDepth/2,fixRect)
+        Screen(w,'FillRect',env.colorDepth/2)
         fixoff = Screen(w,'Flip');
+        fixStillOn = 0;
         
         % Move the gabors until choice is made
         choiceMade = 0;

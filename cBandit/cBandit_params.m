@@ -19,8 +19,8 @@ dataDirectory = strcat(gitDir,splitChar,'cBandit',splitChar,'data');
 time2fix = 2;
 fixHoldTime = .4;
 targHoldTime = .20;
-overlapMin = .2;
-overlapMax = .4;
+overlapMin = .1;
+overlapMax = .2;
 
 % Fixation parameters
 fixcolor = [255 255 255];

@@ -1,5 +1,7 @@
 function stimTargTest(filename,targLoc,location,depth)
 %
+% stimTargTest(filename,targLoc,location,depth)
+%
 % put up a target stimulus and run some stim pulses right before the targ
 % -- idea is to see if target PLR is modulated by FEF stim
 % takes inputs filename, location of hole, depth (from brain 0)
@@ -28,7 +30,7 @@ if nargin < 1
     disp('No filename provided, using test.mat')
     filename = 'test';
 end
-filename = strcat(filename,'TARGSTIM',datestr(now,'mmddyy_HHMM'));
+filename = strcat(filename,'TARGSTIM',datestr(now,'mmddyy_HHMM'))
 
 % make the default environment
 global env; defaultEnv;
@@ -40,11 +42,11 @@ pStimTrial = 0.7;
 
 fixSize = 0.5;
 fixErr = 3;
-fixColor = repmat(max(env.colorDepth),1,3); % bright fix
-minFixed = .4; % min time to hold fix
-maxFixed = .6; % max time to hold fix
+fixColor = [.3 .3 .3]*max(env.colorDepth); % bright fix
+minFixed = .5; % min time to hold fix
+maxFixed = .7; % max time to hold fix
 minITI = 1.5; % min time to hold fix
-maxITI = 2; % max time to hold fix
+maxITI = 2.25; % max time to hold fix
 time2choose = 1; % time to saccade to target
 time2fix = 1; % time to hold fixation after target
 saccadeMode = 0; % type of trials to run, 1 = saccade to target, 0 = hold fixation
@@ -54,7 +56,7 @@ targErr = 10;
 targColor = repmat(max(env.colorDepth),1,3);
 targInLoc = targLoc;
 targOutLoc = [targLoc(1)+180 targLoc(2)]; % opposing side
-bgColor = repmat(max(env.colorDepth)/4,1,3); % dark bg for pupil size
+bgColor = [.1 .1 .1]*max(env.colorDepth); % dark bg for pupil size
 
 voltage = 50; % default, in muA
 duration = 100; % default, in ms
@@ -63,7 +65,7 @@ postStimTime = 2; % how long to collect eye data after stimulation onset
 EYEBALL = 1;
 
 % timestamps that may not be accessed = NaNs
-[fixOnT,fixAcq,stimOn,screenClearT,targOnT,juiceT] = deal(NaN);
+[fixOnT,fixAcq,stimOn,screenClearT,targOnT,juiceT,targOffT] = deal(NaN);
 
 % initialize vars
 tNum = 1;
@@ -71,6 +73,7 @@ continueRun = 1;
 
 % prepare the environment
 prepareEnv; % open the screen, eyelink connectionk, etc
+KbName('UnifyKeyNames');
 disp('environment initialized');
 setupStimDio; % open the dio
 disp('dio open');
@@ -138,7 +141,10 @@ while continueRun
         sampleEye;
     end % can shortcircuit this with stim key
     if ~continueRun; break; end
-    if ~fixed; errorMade = 1; end
+    if ~fixed;
+        errorMade = 1;
+        disp('broke fixation')
+    end
     
     if ~errorMade;        
         % and it's a stim trial, do stim
@@ -147,10 +153,17 @@ while continueRun
             disp('stim delivered, collecting eyedata');
         end
 
-        % do target onset
+        % do target flash
+        Screen(w,'FillRect',fixColor,fixRect)
         Screen(w,'FillRect',targColor,targRect)
         targOnT = Screen(w,'Flip');
-
+        disp('targ onset');
+        
+        WaitSecs(.067); % screen refresh waitsecs)
+        
+        Screen(w,'FillRect',fixColor,fixRect)
+        targOffT = Screen(w,'Flip');
+        
         if saccadeMode
             % check for eye position within the target
             targAcq = 0;
@@ -180,7 +193,7 @@ while continueRun
     screenClearT = Screen(w,'Flip');
 
     % wait a respectable period & collect eye data
-    while (GetSecs() - stimOn) < postStimTime
+    while (GetSecs() - stimOn) < postStimTime+itiTime
         escStimCheck; % mostly to check for juicing
         sampleEye;
     end
@@ -204,9 +217,15 @@ while continueRun
 
     % target information
     trials(tNum).targOn = targOnT;
+    trials(tNum).targOff = targOffT;
     trials(tNum).targInLoc = targInLoc;
     trials(tNum).targOutLoc = targOutLoc;
     trials(tNum).targInLogical = targIn;
+    
+    % brightnesses
+    trials(tNum).targColor = targColor;
+    trials(tNum).fixColor = fixColor;
+    trials(tNum).bgColor = bgColor;
     
     % outcome information
     trials(tNum).error = errorMade;
@@ -231,7 +250,7 @@ while continueRun
     end
     
     % setup the next trial
-    tNum = tNum+1;
+    tNum = tNum+1
     if tNum > nTrials; continueRun = 0; end % or don't
     
     % vars that may not be accessed = NaNs
@@ -392,7 +411,7 @@ function prepareEnv
     
     % setup keyboard
     if ~exist('stopkey') % set defaults in case not set above
-        env.stopkey = KbName('esc');
+        env.stopkey = KbName('escape');
     end
 
     if ~exist('waitkey')

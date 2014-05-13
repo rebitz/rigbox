@@ -20,7 +20,7 @@ if nargin < 1
     disp('No filename provided, using test.mat')
     filename = 'test';
 end
-filename = strcat(filename,'FIXSTIM',datestr(now,'mmddyy_HHMM'));
+filename = strcat(filename,'FIXSTIM',datestr(now,'mmddyy_HHMM'))
 
 % make a default environment!!!
 global env; defaultEnv;
@@ -59,10 +59,15 @@ samples = NaN(31,1);
 while continueRun
 
     % plotting color for this trial
-    if tNum*3 < length(colors)
+    if tNum*colorStep < length(colors)
         trialColor = colors(tNum*colorStep,:);
     else
-        trialColor = colors(tNum*colorStep-length(colors),:);
+        if tNum*colorStep-length(colors) == 0
+            bah = 1;
+        else
+            bah = tNum*colorStep-length(colors);
+        end
+        trialColor = colors(bah,:);
     end
     
     % query the user for current stim information
@@ -121,16 +126,16 @@ while continueRun
 %             postEyeTime = Eyelink('ReadTime');
 %         end
 %     end
-
-    % clear the screen
-    Screen(w,'FillRect',bgColor)
-    screenClearT = Screen(w,'Flip');
     
     % wait a respectable period & collect eye data
     while (GetSecs() - stimOn) < postStimTime
-        % escStimCheck; % no option to escape this - prime data collection!
+        escStimCheck; % juice to keep him fixing
         sampleEye;
     end
+    
+    % clear the screen
+    Screen(w,'FillRect',bgColor)
+    screenClearT = Screen(w,'Flip');
     
     %% close the trial, save all the deets
     trials(tNum).location = location;
@@ -170,8 +175,8 @@ while continueRun
     tstamps = (samples(1,:)/1000)+trials(tNum).trackerOffset;
     idx = and(tstamps > preT, tstamps < postT);
     tstamps = tstamps(idx);
-    xPos = samples(14,idx);
-    yPos = samples(16,idx);
+    xPos = samples(14,idx); xPos(xPos < -32000) = deal(NaN);
+    yPos = samples(16,idx); yPos(yPos < -32000) = deal(NaN);
     pulse = zeros(1,length(tstamps)); % make a cartoon pulse of when stim was on
     idx = and(tstamps >= stimOn, tstamps <= stimOn+(duration./1000));
     pulse(idx) = deal(voltage);
@@ -209,7 +214,7 @@ while continueRun
     
     
     % setup the next trial
-    tNum = tNum+1;
+    tNum = tNum+1
     samples = NaN(size(samples,1),1);
  
 end
