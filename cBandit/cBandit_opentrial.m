@@ -34,6 +34,9 @@ t1origin = NaN; t2origin = NaN;
 % iti times
 iti = itimin + ((itimax - itimin) .* rand(1,1));
 
+% overlap times
+overlap = overlapMin + ((overlapMax-overlapMin) .* rand);
+
 % Initialize sample data
 global samples
 sample_size = 0;

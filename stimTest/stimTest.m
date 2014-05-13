@@ -1,4 +1,4 @@
-function stimTest(filename,location,depth);
+function stimTest(filename,location,depth)
 %
 % put up a fixation cross and run some stim pulses
 % -- plot the output by default to see the saccades generated
@@ -24,6 +24,7 @@ filename = strcat(filename,'FIXSTIM',datestr(now,'mmddyy_HHMM'));
 
 % make a default environment!!!
 global env; defaultEnv;
+KbName('UnifyKeyNames');
 
 % set defaults
 fixSize = 0.5;
@@ -192,7 +193,8 @@ while continueRun
     
     subplot(6,1,4:6); hold on;
     plot(xPos-nanmean(xPos(1:preWindow*1000)),...
-        yPos-nanmean(yPos(1:preWindow*1000)),'Color',trialColor);
+        yPos-nanmean(yPos(1:preWindow*1000)),'Color',trialColor,...
+        'LineWidth',2);
     xlabel('xpos (px)'); ylabel('ypos (px)');
     xlim([-env.screenWidth/2 env.screenWidth/2]);
     ylim([-env.screenHeight/2 env.screenHeight/2]);
@@ -271,7 +273,21 @@ end
 function prepareEnv
     % setup plotting window for us
     h = figure(99); clf; hold on;
-    set(gcf, 'Position', [50 49 409 841]);
+    set(gcf, 'Position', [50 49 509 841]);
+    
+    % then add some reference lines to the plot
+    subplot(6,1,4:6); hold on; clear h
+    radii = [5,10,15,20];
+    for i = 1:length(radii)
+        viscircles([0,0],deg2px(radii(i),env),...
+            'EdgeColor',[.5 .5 .5]);
+    end
+    
+    h(1) = line([-deg2px(20,env) deg2px(20,env)],[0 0]);
+    h(2) = line([-deg2px(20,env) deg2px(20,env)],[deg2px(20,env) -deg2px(20,env)]);
+    h(3) = line([0 0],[-deg2px(20,env) deg2px(20,env)]);
+    h(4) = line([-deg2px(20,env) deg2px(20,env)],[-deg2px(20,env) deg2px(20,env)]);
+    set(h,'Color',[.5 .5 .5],'LineStyle','--');
     
     Screen('CloseAll'); % Screen clear
     warning('off','MATLAB:dispatcher:InexactMatch');
@@ -279,6 +295,9 @@ function prepareEnv
     Screen('Preference','VisualDebugLevel', 0);
     Screen('Preference', 'SuppressAllWarnings', 1);
     Screen('Preference', 'SkipSyncTests',1);
+    
+    xlim([-600 600])
+    ylim([-500 500])
     
     [w, rect] = Screen('OpenWindow',env.screenNumber,bgColor); % window Idx
     [env.screenWidth, env.screenHeight] = WindowSize(w);
@@ -347,7 +366,7 @@ function prepareEnv
     
     % setup keyboard
     if ~exist('stopkey') % set defaults in case not set above
-        env.stopkey = KbName('esc');
+        env.stopkey = KbName('escape');
     end
 
     if ~exist('waitkey')

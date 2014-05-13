@@ -70,20 +70,34 @@ try
         flip_time = .005; % s per frame (actual min is about 0.1667, but this does it at that minima)
         out = []; % targ output params (to save)
         
+        % do the overlap period
+        while ((GetSecs - fixacq) < overlap) && ~error_made
+            fixed = checkFix(origin, fix_err, space);
+            if fixed
+                moveGaborsBandit;
+                sampleEye;
+                esc_check;
+            else
+                error_made = 1;
+                errortype = 2;  % broken fixation
+            end
+        end
+    end
+    
+    if ~error_made
+        
+        % Fixation offset == go cue
+        Screen(w,'FillRect',env.colorDepth/2,fixRect)
+        fixoff = Screen(w,'Flip');
+        
         % Move the gabors until choice is made
         choiceMade = 0;
-        while ((GetSecs - targOn) < showTime) && ~choiceMade
-            
+        while ((GetSecs - fixoff) < showTime) && ~choiceMade
             if fixed % keep fixation on the screen until time
                 moveGaborsBandit;
                 sampleEye;
                 esc_check;
                 fixed = checkFix(origin, fix_err, space);
-                if ~fixed
-                    % Fixation offset
-                    Screen(w,'FillRect',env.colorDepth/2,fixRect)
-                    fixoff = Screen(w,'Flip');
-                end
             elseif checkFix(curTargOri, targ_err, curTargKey);  % Check for fixation on targ
                 targAcq = GetSecs;
                 choiceMade = 1;

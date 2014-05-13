@@ -13,6 +13,7 @@ trial_data.ITIend = ITIend;
 trial_data.fixOn = fixon;
 trial_data.fixAcq = fixacq;
 trial_data.fixOff = fixoff;
+trial_data.overlap = overlap;
 
 % Target / choice / reward
 trial_data.targOn = targOn;
