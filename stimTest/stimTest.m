@@ -1,4 +1,4 @@
-function stimTest(filename,location,depth);
+function stimTest(filename,location,depth)
 %
 % put up a fixation cross and run some stim pulses
 % -- plot the output by default to see the saccades generated
@@ -20,17 +20,18 @@ if nargin < 1
     disp('No filename provided, using test.mat')
     filename = 'test';
 end
-filename = strcat(filename,'FIXSTIM',datestr(now,'mmddyy_HHMM'));
+filename = strcat(filename,'FIXSTIM',datestr(now,'mmddyy_HHMM'))
 
 % make a default environment!!!
 global env; defaultEnv;
+KbName('UnifyKeyNames');
 
 % set defaults
 fixSize = 0.5;
 fixErr = 2;
 fixColor = repmat(max(env.colorDepth),1,3); % bright fix
 bgColor = repmat(max(env.colorDepth)/3,1,3); % dark bg
-current = 50; % default, in muA
+voltage = 50; % default, in muA
 duration = 100; % default, in ms
 fixOnTrue = 1; % default to on
 postStimTime = 2; % how long to collect eye data after stimulation onset
@@ -58,10 +59,15 @@ samples = NaN(31,1);
 while continueRun
 
     % plotting color for this trial
-    if tNum*3 < length(colors)
+    if tNum*colorStep < length(colors)
         trialColor = colors(tNum*colorStep,:);
     else
-        trialColor = colors(tNum*colorStep-length(colors),:);
+        if tNum*colorStep-length(colors) == 0
+            bah = 1;
+        else
+            bah = tNum*colorStep-length(colors);
+        end
+        trialColor = colors(bah,:);
     end
     
     % query the user for current stim information
@@ -120,22 +126,22 @@ while continueRun
 %             postEyeTime = Eyelink('ReadTime');
 %         end
 %     end
-
-    % clear the screen
-    Screen(w,'FillRect',bgColor)
-    screenClearT = Screen(w,'Flip');
     
     % wait a respectable period & collect eye data
     while (GetSecs() - stimOn) < postStimTime
-        % escStimCheck; % no option to escape this - prime data collection!
+        escStimCheck; % juice to keep him fixing
         sampleEye;
     end
+    
+    % clear the screen
+    Screen(w,'FillRect',bgColor)
+    screenClearT = Screen(w,'Flip');
     
     %% close the trial, save all the deets
     trials(tNum).location = location;
     trials(tNum).depth = depth;
     
-    trials(tNum).current = current;
+    trials(tNum).voltage = voltage;
     trials(tNum).duration = duration;
     trials(tNum).fixOnTrue = fixOnTrue;
 
@@ -169,11 +175,11 @@ while continueRun
     tstamps = (samples(1,:)/1000)+trials(tNum).trackerOffset;
     idx = and(tstamps > preT, tstamps < postT);
     tstamps = tstamps(idx);
-    xPos = samples(14,idx);
-    yPos = samples(16,idx);
+    xPos = samples(14,idx); xPos(xPos < -32000) = deal(NaN);
+    yPos = samples(16,idx); yPos(yPos < -32000) = deal(NaN);
     pulse = zeros(1,length(tstamps)); % make a cartoon pulse of when stim was on
     idx = and(tstamps >= stimOn, tstamps <= stimOn+(duration./1000));
-    pulse(idx) = deal(current);
+    pulse(idx) = deal(voltage);
     tFromStim = tstamps - min(tstamps);
     
     % then plotting
@@ -192,7 +198,8 @@ while continueRun
     
     subplot(6,1,4:6); hold on;
     plot(xPos-nanmean(xPos(1:preWindow*1000)),...
-        yPos-nanmean(yPos(1:preWindow*1000)),'Color',trialColor);
+        yPos-nanmean(yPos(1:preWindow*1000)),'Color',trialColor,...
+        'LineWidth',2);
     xlabel('xpos (px)'); ylabel('ypos (px)');
     xlim([-env.screenWidth/2 env.screenWidth/2]);
     ylim([-env.screenHeight/2 env.screenHeight/2]);
@@ -207,7 +214,7 @@ while continueRun
     
     
     % setup the next trial
-    tNum = tNum+1;
+    tNum = tNum+1
     samples = NaN(size(samples,1),1);
  
 end
@@ -271,7 +278,21 @@ end
 function prepareEnv
     % setup plotting window for us
     h = figure(99); clf; hold on;
-    set(gcf, 'Position', [50 49 409 841]);
+    set(gcf, 'Position', [50 49 509 841]);
+    
+    % then add some reference lines to the plot
+    subplot(6,1,4:6); hold on; clear h
+    radii = [5,10,15,20];
+    for i = 1:length(radii)
+        viscircles([0,0],deg2px(radii(i),env),...
+            'EdgeColor',[.5 .5 .5]);
+    end
+    
+    h(1) = line([-deg2px(20,env) deg2px(20,env)],[0 0]);
+    h(2) = line([-deg2px(20,env) deg2px(20,env)],[deg2px(20,env) -deg2px(20,env)]);
+    h(3) = line([0 0],[-deg2px(20,env) deg2px(20,env)]);
+    h(4) = line([-deg2px(20,env) deg2px(20,env)],[-deg2px(20,env) deg2px(20,env)]);
+    set(h,'Color',[.5 .5 .5],'LineStyle','--');
     
     Screen('CloseAll'); % Screen clear
     warning('off','MATLAB:dispatcher:InexactMatch');
@@ -279,6 +300,9 @@ function prepareEnv
     Screen('Preference','VisualDebugLevel', 0);
     Screen('Preference', 'SuppressAllWarnings', 1);
     Screen('Preference', 'SkipSyncTests',1);
+    
+    xlim([-600 600])
+    ylim([-500 500])
     
     [w, rect] = Screen('OpenWindow',env.screenNumber,bgColor); % window Idx
     [env.screenWidth, env.screenHeight] = WindowSize(w);
@@ -347,7 +371,7 @@ function prepareEnv
     
     % setup keyboard
     if ~exist('stopkey') % set defaults in case not set above
-        env.stopkey = KbName('esc');
+        env.stopkey = KbName('escape');
     end
 
     if ~exist('waitkey')
@@ -364,9 +388,9 @@ function prepareEnv
 end
 
 function queryUser
-    promt = {'current:','duration','fixation displayed?'};
+    promt = {'voltage:','duration','fixation displayed?'};
     nLines = 1;
-    def = {num2str(current),num2str(duration),'y'};
+    def = {num2str(voltage),num2str(duration),'y'};
     tmp = inputdlg(promt,'test',nLines,def);
     
     if isempty(tmp) % cancel was pressed
@@ -374,10 +398,10 @@ function queryUser
     else
         curIn = str2num(tmp{1});
         if isempty(curIn);
-            fprintf('\n no current given, recording %0g mA \n',current);
-            current = current; % assume no change if no info provided
+            fprintf('\n no voltage given, recording %0g mV \n',voltage);
+            voltage = voltage; % assume no change if no info provided
         else
-            current = curIn;
+            voltage = curIn;
         end
         
         durIn = str2num(tmp{2});

@@ -35,6 +35,9 @@ t1origin = NaN; t2origin = NaN;
 % iti times
 iti = itimin + ((itimax - itimin) .* rand(1,1));
 
+% overlap times
+overlap = overlapMin + ((overlapMax-overlapMin) .* rand);
+
 % Initialize sample data
 global samples
 sample_size = 0;
@@ -112,7 +115,7 @@ elseif probe
     
     if rand < .5;
         dir2 = 'CCW';
-        t1Mov = flipud(t1Mov);
+        t2Mov = flipud(t2Mov);
     else
         dir2 = 'CW';
     end

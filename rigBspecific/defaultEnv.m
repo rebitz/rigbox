@@ -18,3 +18,5 @@ setupDIO;
 env.allDIOclosed = flags;
 env.nports = nports;
 env.digOut = digOut;
+
+KbName('UnifyKeyNames');

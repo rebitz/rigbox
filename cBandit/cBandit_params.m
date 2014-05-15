@@ -19,6 +19,8 @@ dataDirectory = strcat(gitDir,splitChar,'cBandit',splitChar,'data');
 time2fix = 2;
 fixHoldTime = .4;
 targHoldTime = .20;
+overlapMin = .1;
+overlapMax = .2;
 
 % Fixation parameters
 fixcolor = [255 255 255];
@@ -54,7 +56,7 @@ color2 = [7/9 2/9 7/9]; % pink/green
 colors = [color1; color2];
 
 % Reward parameters are actually set in open task
-walkRewards = 0; % else just deliver at lower and upper bounds
+walkRewards = 1; % else just deliver at lower and upper bounds
 rwdLB = 10; % lower bound, if ~walkRewards, just assigns to these
 rwdUB = 90; % % upper bound
 hazard = 0.15; % p(step), size fixed at 10%

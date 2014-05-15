@@ -11,7 +11,7 @@ try
     % Trial starts
     trialstart = markEvent('trialStart');
     
-    % ITI period starts
+    % ITI period starts 
     ITIstart = GetSecs;
     
     % ITI (while gathering pupil data / checking for esc)
@@ -64,6 +64,7 @@ try
     
     if ~error_made % Display MIB targ
         
+        fixStillOn = 1;
         targOn = GetSecs;  % time of onset of targets - NOT PRECISE!
         
         lasttime = targOn; % time of pervious frame for targets
@@ -72,20 +73,35 @@ try
         flip_time = .005; % s per frame (actual min is about 0.1667, but this does it at that minima)
         out = []; % targ output params (to save)
         
+        % do the overlap period
+        while ((GetSecs - targOn) < overlap) && ~error_made
+            fixed = checkFix(origin, fix_err, space);
+            if fixed
+                moveGaborsBandit;
+                sampleEye;
+                esc_check;
+            else
+                error_made = 1;
+                errortype = 2;  % broken fixation
+            end
+        end
+    end
+    
+    if ~error_made
+        
+        % Fixation offset
+        Screen(w,'FillRect',env.colorDepth/2)
+        fixoff = Screen(w,'Flip');
+        fixStillOn = 0;
+                    
         % Move the gabors until choice is made
         choiceMade = 0;
-        while ((GetSecs - targOn) < showTime) && ~choiceMade
-            
+        while ((GetSecs - fixoff) < showTime) && ~choiceMade
             if fixed % keep fixation on the screen until time
                 moveGaborsBandit;
                 sampleEye;
                 esc_check;
                 fixed = checkFix(origin, fix_err, space);
-                if ~fixed
-                    % Fixation offset
-                    Screen(w,'FillRect',env.colorDepth/2,fixRect)
-                    fixoff = Screen(w,'Flip');
-                end
             % mapped to physical locations of the targets ??
             elseif checkFix(t1origin, targ_err, left);
                 targAcq = GetSecs;
