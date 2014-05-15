@@ -171,8 +171,9 @@ try
         
         % Give reward based on rwd contingency
         rewarded = 0;
-        
-        if rand < (curTargRwd/100)
+        rwdDice = rand;
+
+        if rwdDice < (curTargRwd/100)
             rewarded = 1;       
         end
 

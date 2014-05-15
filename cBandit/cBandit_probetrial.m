@@ -180,11 +180,12 @@ try
         
         % Give reward based on rwd contingency
         rewarded = 0;
-        
-        if choice == 1 && (rand < (t1Rwd/100))
+        rwdDice = rand;
+
+        if choice == 1 && (rwdDice < (t1Rwd/100))
             % juice
             rewarded = 1;
-        elseif choice == 2 && (rand < (t2Rwd/100))
+        elseif choice == 2 && (rwdDice < (t2Rwd/100))
             % juice
             rewarded = 1;    
         end

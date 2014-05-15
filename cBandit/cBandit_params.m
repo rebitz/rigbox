@@ -58,7 +58,9 @@ walkRewards = 0; % else just deliver at lower and upper bounds
 rwdLB = 10; % lower bound, if ~walkRewards, just assigns to these
 rwdUB = 90; % % upper bound
 hazard = 0.15; % p(step), size fixed at 10%
+hazard = 0.02; % works well for the block style
 nToGen = 2000; % length of vector to generate
+minContinuousValues = 100; % n trials w/ no switches in block version
 
 % Probability of target moving location
 p_move = .2;

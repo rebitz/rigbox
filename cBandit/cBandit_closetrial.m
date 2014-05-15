@@ -26,6 +26,7 @@ trial_data.dir = dir;
 trial_data.choice = choice;
 trial_data.correct = correct;
 trial_data.rewarded = rewarded;
+trial_data.rwdDice = rwdDice;
 trial_data.targ = curTarg;
 trial_data.condition = curTargLoc; % actually target position
 
@@ -37,6 +38,7 @@ end
 
 % probe trials
 trial_data.probe = probe;
+trial_data.forced = ~probe;
 trial_data.choice = choice;
 trial_data.targ1 = t1id; % t1
 trial_data.t1Rwd = t1Rwd; % t1

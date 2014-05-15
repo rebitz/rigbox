@@ -1,4 +1,4 @@
-function [T1,T2] = generateWalkForBandit(hazard,ntrials,bounds)
+function [T1,T2] = generateWalkForBandit(hazard,ntrials,bounds,stepSize)
 % output 2 value vectors that match our requirements
 % 1. bounded at bounds [LB UB], eg [10 90];
 % 2. evens out every 500 trials, E(t1) =ish E(t2)
@@ -16,6 +16,17 @@ if nargin < 3
     high = 90;
 else
     low = min(bounds); high = max(bounds);
+end
+
+if nargin < 4
+    stepSize = 1;
+elseif stepSize > 1
+    stepSize = stepSize/10;
+end
+
+% hopefully it will never come to this
+if stepSize > (range(bounds)/10)
+    stepSize = range(bounds)/10;
 end
 
 chunk = 750; % trials to even out over
@@ -76,9 +87,6 @@ function [T1vals,T2vals] = tryWalk(high,low)
 % easier to operate on integer steps
 low = low / 10; high = high / 10;
 
-% % variance in random process
-% stStep = stepSize * 2/3;
-
 % seed randomly
 % seedIn = [high-low]
 T1seed = low + randperm([high-low],1);
@@ -91,8 +99,13 @@ T1transitions = binornd(ones(1,ntrials),hazard);
 T2transitions = binornd(ones(1,ntrials),hazard);
 
 % make some of them negative
-T1signs = binornd(ones(1,ntrials),.5); T1transitions(and(T1transitions,T1signs)) = -1;
-T2signs = binornd(ones(1,ntrials),.5); T2transitions(and(T2transitions,T2signs)) = -1;
+T1signs = binornd(ones(1,ntrials),.5);
+T1transitions(and(T1transitions,T1signs)) = -1;
+T2signs = binornd(ones(1,ntrials),.5);
+T2transitions(and(T2transitions,T2signs)) = -1;
+
+T1transitions = T1transitions*stepSize;
+T2transitions = T2transitions*stepSize;
 
 % the dreaded for loop
 for i = 1:ntrials

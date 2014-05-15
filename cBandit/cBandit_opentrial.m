@@ -11,6 +11,7 @@ targOn = NaN;  % MIB stimuli appearance
 targAcq = NaN;
 trialstart = NaN;   % start of the trial
 juiceTime = NaN;
+rwdDice = NaN;
 
 % Error vars
 error_made = NaN;   % error flag

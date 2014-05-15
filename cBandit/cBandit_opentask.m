@@ -55,9 +55,10 @@ if sum(strcmp(files,filestart))<1 % but if we're wrong
     if walkRewards;
         [t1Rwd,t2Rwd] = generateWalkForBandit(hazard,nToGen ,[rwdLB rwdUB]);
     else % randomly assign the two bounds to the values
-        fu = Shuffle([rwdLB rwdUB]);
-        t1Rwd = repmat(fu(1),1,nToGen);
-        t2Rwd = repmat(fu(2),1,nToGen);
+        [t1Rwd,t2Rwd] = generateBlockForBandit(hazard, nToGen ,[rwdLB rwdUB], minContinuousValues);
+        % fu = Shuffle([rwdLB rwdUB]);
+        % t1Rwd = repmat(fu(1),1,nToGen);
+        % t2Rwd = repmat(fu(2),1,nToGen);
     end
     
     % make a struct w/ rewards
