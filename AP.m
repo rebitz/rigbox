@@ -4,14 +4,14 @@
 host = cellstr(host);
 
 if strcmp(host{1},'dn2lk5n84.stanford.edu')
+    % enter the path to the git hub directory
     cd('/Users/becket/Documents/MATLAB/pbox');
     compName = 'laptop';
-else
+elseif strcmp(host{1},'rigF hostname')
     cd('')
     compName = 'rigF';
 end
 
-    
 files = dir;
 folders = {files([files.isdir]).name};
 folders = folders(cellfun(@isempty,strfind(folders,'.')));
