@@ -22,6 +22,8 @@ trials.targOff = targoff;
 trials.targAcq = targAcq;
 trials.targGap = targGap;
 
+trials.imageName = imName;
+
 trials.theta = targTh;
 trials.radius = targR;
 trials.targRect = targRect;
