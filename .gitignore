@@ -1,4 +1,6 @@
 ./*/data/
+./*/stimuli/
+stimuli/
 data/
 .DS_Store
 *.asv

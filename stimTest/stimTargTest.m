@@ -38,7 +38,8 @@ global env; defaultEnv;
 % set parameters
 changingStimParams = 0; % 0 = use info provided at start of run
 nTrials = 100;
-pStimTrial = 0.7;
+pStimTrial = 0.5;
+pTargOnTrial = 0.7;
 
 fixSize = 0.5;
 fixErr = 3;
@@ -53,7 +54,7 @@ saccadeMode = 0; % type of trials to run, 1 = saccade to target, 0 = hold fixati
 
 targSize = 3;
 targErr = 10;
-targColor = repmat(max(env.colorDepth),1,3);
+targColor = [.7 .7 .7]*max(env.colorDepth);
 targInLoc = targLoc;
 targOutLoc = [targLoc(1)+180 targLoc(2)]; % opposing side
 bgColor = [.1 .1 .1]*max(env.colorDepth); % dark bg for pupil size
@@ -61,6 +62,7 @@ bgColor = [.1 .1 .1]*max(env.colorDepth); % dark bg for pupil size
 voltage = 50; % default, in muA
 duration = 100; % default, in ms
 % fixOnTrue = 1; % default to on
+stimWait = 0.04; % min time post stim before distractor is flashed
 postStimTime = 2; % how long to collect eye data after stimulation onset
 EYEBALL = 1;
 
@@ -103,6 +105,9 @@ while continueRun
     
     % stim or no stim trial?
     stimTrial = convertProb(pStimTrial); stimTrial = stimTrial(1);
+    
+    % targ on or not on trial?
+    targOnTrial = convertProb(pTargOnTrial); stimTrial = stimTrial(1);
     
     % pick hold time for this trial
     holdTime = rand*(maxFixed-minFixed)+minFixed;
@@ -151,15 +156,23 @@ while continueRun
         if stimTrial
             stimPulse;
             disp('stim delivered, collecting eyedata');
+        else
+            stimOn = GetSecs;
         end
 
+        while (GetSecs - stimOn) < stimWait
+            sampleEye;
+        end
+        
         % do target flash
         Screen(w,'FillRect',fixColor,fixRect)
-        Screen(w,'FillRect',targColor,targRect)
+        if targOnTrial % but only if logical tells you to
+            Screen(w,'FillRect',targColor,targRect)
+        end
         targOnT = Screen(w,'Flip');
         disp('targ onset');
         
-        WaitSecs(.067); % screen refresh waitsecs)
+        WaitSecs(.067); % screen refresh waitsecs
         
         Screen(w,'FillRect',fixColor,fixRect)
         targOffT = Screen(w,'Flip');
@@ -204,6 +217,9 @@ while continueRun
     
     % stimulation parameters
     trials(tNum).stimTrial = stimTrial; % logical
+    trials(tNum).targOnTrial = targOnTrial;
+    trials(tNum).stimWaitMin = stimWait;
+    trials(tNum).stimWaitTrue = targOnT - stimOn;
     trials(tNum).voltage = voltage;
     trials(tNum).duration = duration;
 

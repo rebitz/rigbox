@@ -1,4 +1,4 @@
-global EYEBALL samples
+global samples
 
 esc_check;
 
