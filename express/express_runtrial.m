@@ -138,8 +138,8 @@ try
     % Some type of error in the trial
     if error_made
         
-        Screen(w,'FillRect',errorColor,errorRect);
-        errorFeedback = Screen(w,'Flip');
+        %Screen(w,'FillRect',errorColor,errorRect);
+        %errorFeedback = Screen(w,'Flip');
         
         while ((GetSecs - errorFeedback) < errorSecs)
             sampleEye;
