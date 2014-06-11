@@ -8,7 +8,7 @@
 %       filename - name of files to be saved as data output
 %       mode - 'EYE' or 'TEST'
 
-function express(filename)
+function express(filename,mode)
 
 try
     ListenChar(2);

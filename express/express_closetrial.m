@@ -36,6 +36,8 @@ trials.errortype = errortype;
 
 trials.eyedata = samples;
 
+pcTime = NaN;
+
 if EYEBALL
     r = Eyelink('RequestTime');
     if r == 0
@@ -45,9 +47,9 @@ if EYEBALL
         afterTime = GetSecs();
         
         pcTime = mean([beforeTime,afterTime]); % in s
-        trial_data.pcTime = pcTime;
-        trial_data.trackerTime = trackerTime;
-        trial_data.trackerOffset = pcTime - (trackerTime./1000);
+        trials.pcTime = pcTime;
+        trials.trackerTime = trackerTime;
+        trials.trackerOffset = pcTime - (trackerTime./1000);
         % would make legit time = (eyeTimestamp/1000)+offset
     end
 end

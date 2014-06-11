@@ -7,8 +7,8 @@ if strcmp(host{1},'dn2lk5n84.stanford.edu')
     % enter the path to the git hub directory
     cd('/Users/becket/Documents/MATLAB/pbox');
     compName = 'laptop';
-elseif strcmp(host{1},'rigF hostname')
-    cd('')
+elseif strcmp(host{1}, 'Eddy-PC')
+    cd('C:\Users\Eddy\Documents\GitHub\rigbox')
     compName = 'rigF';
 end
 

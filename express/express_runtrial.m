@@ -30,7 +30,6 @@ try
     sampleEye;
     
     % Wait for fixation
-
     fixed = 0;
     while (GetSecs - fixon) < time2fix && ~fixed
         fixed = checkFix(origin, fix_err, space);

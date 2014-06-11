@@ -13,6 +13,7 @@ end
 global TESTING
 if strcmp(mode, 'TEST')
     TESTING = 1;
+    EYEBALL = 0;
 else
     TESTING = 0;
 end

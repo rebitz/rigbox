@@ -35,7 +35,7 @@ bgcolor = [127 127 127];
 % Fixation parameters
 fixcolor = [255 255 255];
 fixSize = .5; % in dg
-fix_err = 3; % in dg
+fix_err = 4; % in dg
 
 % Target parameters
 targSize = 6; % only controls the width
