@@ -65,7 +65,7 @@ try
             Screen('DrawLine', w, cuecolor, cueLoc(1), cueLoc(2), cueLoc(3), cueLoc(4), cueWidth);
             cueon = Screen(w,'Flip');
             cueOn = 1;
-        elseif ((GetSecs - fixacq) < cueLatency+cueOnT)
+        elseif ((GetSecs - cueon) > cueOnT)
             % Cue offset
             %Screen('DrawLine', w, env.colorDepth/2, cueLoc(1), cueLoc(2), cueLoc(3), cueLoc(4));
             Screen(w,'FillRect',fixcolor,fixRect);
@@ -177,7 +177,7 @@ try
     
     % Some type of error in the trial
     if error_made
-        errortype;
+        errortype
         
         Screen(w,'FillRect',errorColor,errorRect);
         errorFeedback = Screen(w,'Flip');
@@ -213,7 +213,7 @@ try
         
     else % No errors, correct trial
         
-        correct = 1;
+        correct = 1; % actually completed
         
         % Give reward based on rwd contingency
         rewarded = 0;
@@ -229,6 +229,7 @@ try
             % juice
             rewarded = 1;  
         end
+        rewarded
 
         if strcmp(env.rigID,'RigB')
             if rewarded

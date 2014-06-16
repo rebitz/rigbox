@@ -36,7 +36,7 @@ fixSize = .5; % in dg
 fix_err = 3; % in dg
 
 % Target parameters
-targSize = 1;
+targSize = 5;
 targcolor = [255 255 255];
 
 % Inter-trial interval bounds (s)

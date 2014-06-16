@@ -13,6 +13,17 @@ iti = itimin + (itimin - itimax) .* rand(1,1);
 
 %% Ensure output
 
+% open serial write port:
+port = serial('COM1','BaudRate',115200);
+try,
+    fopen(port);
+catch
+    disp('some ports still open, closing them now')
+    delete(instrfindall);
+    port = serial('COM1','BaudRate',115200);
+    fopen(port);
+end
+
 % Initialize outputs
 global task_data;
 task_data = struct();

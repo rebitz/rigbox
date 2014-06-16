@@ -19,7 +19,7 @@ try
     ITIend = GetSecs;
     
     % Trial starts
-    trialstart = GetSecs;
+    trialstart = markEvent('trialStart');
     
     sampleEye;  % (does nothing if EYEBALL)
     
@@ -198,9 +198,10 @@ try
         juiceTime = markEvent('juice');
 %         giveJuice;
         correct = 1;
-        trialstop = GetSecs();
         
     end
+    
+    trialstop = markEvent('trialStop');
     
 catch
     

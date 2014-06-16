@@ -22,3 +22,13 @@ closeDIO;
 % Clear and back to command line
 sca;
 commandwindow;
+
+% clearIPaddress
+ipConfig = 'netsh int ip set address \"Local Area Connection\" dhcp';
+result = system(ipConfig);
+
+if result == 0
+    disp('ip address sucessfully returned to normal')
+else
+    disp('ERROR: problem with IP address configuration')
+end

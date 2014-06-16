@@ -10,6 +10,9 @@ if strcmp(host{1},'dn2lk5n84.stanford.edu')
 elseif strcmp(host{1}, 'Eddy-PC')
     cd('C:\Users\Eddy\Documents\GitHub\rigbox')
     compName = 'rigF';
+elseif strcmp(host{1}, 'GB1LPM1')
+    cd('C:\Users\User\Documents\rigbox')
+    compName = 'rigB';
 end
 
 files = dir;
@@ -33,5 +36,3 @@ end
 addpath(folders{:})
 
 addpath(strcat(gitDir,splitChar,compName,'specific'))
-
-defaultEnv;

@@ -51,7 +51,11 @@ if sum(strcmp(files,filestart))<1 % but if we're wrong
     pickFolders = randperm([1:length(folders)]);
     cd(folders{pickFolders(1)}); % now we're in a particular session
     
-    replayConcatBlocks;
+    if randChoices
+        choices = randi(3,ntrials,1);
+    else
+        replayConcatBlocks;
+    end
     
     t1Rwd = choices == 1;
     t2Rwd = choices == 2;

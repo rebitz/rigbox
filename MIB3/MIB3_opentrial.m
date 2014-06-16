@@ -90,17 +90,14 @@ if EYEBALL
     Eyelink('command', 'clear_screen %d', 0);
     Eyelink('command', 'draw_cross %d %d 15', env.screenWidth/2, env.screenHeight/2);
     Eyelink('command', 'draw_box %d %d %d %d 15', round(fixRect(1)), round(fixRect(2)), round(fixRect(3)), round(fixRect(4)));
-    
-%     % Only show the target box of the forced targ if it's a forced trial
-%     if ~forced
-%         Eyelink('command', 'draw_box %d %d %d %d 15', round(gRect1(1)), round(gRect1(2)), round(gRect1(3)), round(gRect1(4)));
-%         Eyelink('command', 'draw_box %d %d %d %d 15', round(gRect2(1)), round(gRect2(2)), round(gRect2(3)), round(gRect2(4)));
-%     elseif strcmp(forcedLR, 'L')
-%         Eyelink('command', 'draw_box %d %d %d %d 15', round(gRect1(1)), round(gRect1(2)), round(gRect1(3)), round(gRect1(4)));
-%     else
-%         Eyelink('command', 'draw_box %d %d %d %d 15', round(gRect2(1)), round(gRect2(2)), round(gRect2(3)), round(gRect2(4)));
-%     end
-    
+
+    Eyelink('command', 'draw_box %d %d %d %d 15',...
+        round(t1Rect(1)), round(t1Rect(2)), round(t1Rect(3)), round(t1Rect(4)));
+    Eyelink('command', 'draw_box %d %d %d %d 15',...
+        round(t2Rect(1)), round(t2Rect(2)), round(t2Rect(3)), round(t2Rect(4)));
+    Eyelink('command', 'draw_box %d %d %d %d 15',...
+        round(t3Rect(1)), round(t3Rect(2)), round(t3Rect(3)), round(t3Rect(4)));
+
 end
 
 disp(num2str(trialnum))

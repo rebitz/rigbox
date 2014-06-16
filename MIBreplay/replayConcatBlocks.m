@@ -39,7 +39,7 @@ choices = choices(~isnan(choices));
 
 % make choices the right length for what we're looking for
 while length(choices) < ntrials
-    choices = [chocies chocies];   
+    choices = [choices choices];
 end
 
 keepIdx = zeros(1,length(choices));

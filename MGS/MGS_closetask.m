@@ -19,12 +19,15 @@ end
 % close the DIO
 closeDIO;
 
+% close the serial port
+fclose(port);
+delete(port);
+delete(instrfindall);
+
 % Clear and back to command line
 sca;
 commandwindow;
 
-accuracy = nanmean([trial_data.correct])
-
-
+accuracy = nanmean([trial_data.correct]);
 
 

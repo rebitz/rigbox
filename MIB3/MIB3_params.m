@@ -48,9 +48,9 @@ tOffset = 8; % degrees
 % Target features
 maxFrames = 200; % # of frames in the movie - make enough that it's not jerky
 gSize = [400 400]; % px size of the image
-phaseStep = 45; % affects the speed of movement
+phaseStep = 20; % affects the speed of movement
 showTime = 2; % duration stim are on for - REMOVE ME
-targ_err = 15; % in dg
+targ_err = 10; % in dg
 
 % Target colors
 color1 = [2/3 4/9 0];

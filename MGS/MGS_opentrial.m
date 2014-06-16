@@ -44,7 +44,7 @@ a(1) = mod(targTh,256);
 a(2) = floor(targTh ./ 256);
 a(3) = targR;
 
-% fwrite(port,a);
+fwrite(port,a);
 
 % on plexon's end:
 % a(1) = a(1) + a(2).*256;
@@ -74,6 +74,8 @@ if EYEBALL
     Eyelink('command', 'draw_cross %d %d 15', env.screenWidth/2, env.screenHeight/2);
     Eyelink('command', 'draw_box %d %d %d %d 15', round(fixRect(1)), round(fixRect(2)), round(fixRect(3)), round(fixRect(4)));
     
-    Eyelink('command', 'draw_box %d %d %d %d 15', round(actualBox(1)), round(actualBox(2)), round(actualBox(3)), round(actualBox(4)));
+    Eyelink('command', 'draw_box %d %d %d %d 15',...
+        round(targRect(1)), round(targRect(2)), round(targRect(3)), round(targRect(4)));
+
     
 end
