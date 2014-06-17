@@ -29,11 +29,11 @@ if stepSize > (range(bounds)/10)
     stepSize = range(bounds)/10;
 end
 
-chunk = 750; % trials to even out over
-err = 15; % allow x% variance btw means
+chunk = 700; % trials to even out over
+err = 20; % allow x% variance btw means
 
-motivationThresh = 20;
-motivationTrials = 50;
+motivationThresh = 30;
+motivationTrials = 80;
 
 % try,
 runIt = 1; attempts = 0;

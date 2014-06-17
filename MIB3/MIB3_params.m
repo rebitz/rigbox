@@ -27,8 +27,10 @@ dataDirectory = strcat(gitDir,splitChar,'MIB3',splitChar,'data');
 walkRewards = 1; % else just deliver at lower and upper bounds
 rwdLB = 10; % lower bound, if ~walkRewards, just assigns to these
 rwdUB = 90; % % upper bound
-hazard = 0.15; % p(step), size fixed at 10%
-hazard = 0.02; % works well for the block style
+hazard = 0.10; % p(step), size fixed at 10%
+if ~walkRewards
+    hazard = 0.02; % works well for the block style
+end
 nToGen = 2000; % length of vector to generate
 minContinuousValues = 100; % n trials w/ no switches in block version
 
