@@ -71,22 +71,25 @@ t3Rwd = rwds.t3Rwd(rwds.counter);
 % assign dir of movement
 if rand < .5;
     dir1 = 'CCW';
-    t1Mov = flipud(t1Mov);
+    t1Mov = flipud(t1MovOriginal);
 else
+    t1Mov = t1MovOriginal;
     dir1 = 'CW';
 end
 
 if rand < .5;
     dir2 = 'CCW';
-    t2Mov = flipud(t2Mov);
+    t2Mov = flipud(t2MovOriginal);
 else
+    t2Mov = t2MovOriginal;
     dir2 = 'CW';
 end
 
 if rand < .5;
     dir3 = 'CCW';
-    t3Mov = flipud(t3Mov);
+    t3Mov = flipud(t3MovOriginal);
 else
+    t3Mov = t3MovOriginal;
     dir3 = 'CW';
 end
 

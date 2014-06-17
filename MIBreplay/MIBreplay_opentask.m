@@ -168,7 +168,7 @@ cueBox3 = [origin c3end];
 
 %% Create MIB target movies
 % l1c1 -> location 1, color 1
-[t1Mov,t2Mov,t3Mov] = deal(NaN(ceil(360/phaseStep),1));
+[t1MovOriginal,t2MovOriginal,t3MovOriginal] = deal(NaN(ceil(360/phaseStep),1));
 
 phase = 0;  % init phase
 
@@ -181,17 +181,17 @@ for i = 1:(360/phaseStep);
     % Make cur frame for targ 1
     frame = gabor(gSize, 2, t1orientation, phase, 20, 0.5, 0.5);
     frame = frame .* env.colorDepth;
-    t1Mov(i) = Screen('MakeTexture',w,frame);
+    t1MovOriginal(i) = Screen('MakeTexture',w,frame);
     
     % Make cur frame for targ 2
     frame = gabor(gSize, 2, t2orientation, phase, 20, 0.5, 0.5);
     frame = frame .* env.colorDepth;
-    t2Mov(i) = Screen('MakeTexture',w,frame);
+    t2MovOriginal(i) = Screen('MakeTexture',w,frame);
     
     % Make cur frame for targ 3
     frame = gabor(gSize, 2, t3orientation, phase, 20, 0.5, 0.5);
     frame = frame .* env.colorDepth;
-    t3Mov(i) = Screen('MakeTexture',w,frame);
+    t3MovOriginal(i) = Screen('MakeTexture',w,frame);
     
 end
 
