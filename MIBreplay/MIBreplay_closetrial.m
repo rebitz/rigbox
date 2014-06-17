@@ -17,6 +17,7 @@ trial_data.fixHoldTime = fixHoldTime;
 trial_data.overlap = overlap;
 
 % Target / choice / reward
+trial_data.whichTargOn = tOn; % logical of t1-3 on-ness
 trial_data.targOn = targOn;
 trial_data.targAllTimestamps = allTimes; % frame flipTime
 trial_data.targAcq = targAcq;

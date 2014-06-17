@@ -101,17 +101,17 @@ try
                 esc_check;
                 fixed = checkFix(origin, fix_err, space);
             % mapped to physical locations of the targets ??
-            elseif checkFix(t1origin, targ_err, left);
+            elseif tOn(1) && checkFix(t1origin, targ_err, left);
                 targAcq = GetSecs;
                 choice = 1;
                 choiceMade = 1;
                 curTargKey = left; curTargOri = t1origin;
-            elseif checkFix(t2origin, targ_err, right);
+            elseif tOn(2) && checkFix(t2origin, targ_err, right);
                 targAcq = GetSecs;
                 choice = 2;
                 choiceMade = 1;
                 curTargKey = right; curTargOri = t2origin;
-            elseif checkFix(t3origin, targ_err, down);
+            elseif tOn(3) && checkFix(t3origin, targ_err, down);
                 targAcq = GetSecs;
                 choice = 3;
                 choiceMade = 1;

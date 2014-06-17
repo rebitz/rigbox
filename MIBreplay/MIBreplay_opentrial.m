@@ -30,9 +30,15 @@ rewarded = NaN;
 dir = 'CW';      % direction of gabor (CW: clockwise, CCW: counter clock wise)
 
 % determine if this is a probe trial
-probe = 0;%and(rand < p_probe,trialnum>0);
-% initialize probe vars
-dir1 = NaN; dir2 = NaN;  dir3 = NaN;
+probe = and(rand < p_probe,trialnum>0);
+
+% here, probe means only 1 t on screen
+% else, we put up distractors also
+if probe
+    tOn = zeros(1,3);
+else
+    tOn = ones(1,3);
+end
 
 % iti times
 iti = itimin + ((itimax - itimin) .* rand(1,1));
@@ -97,6 +103,11 @@ elseif rwds.choices(rwds.counter) == 2
 elseif rwds.choices(rwds.counter) == 3
     cueLoc = cueBox3;
 end       
+
+% do the probe thing:
+if probe
+    tOn(rwds.choices(rwds.counter)) = 1;
+end
 
 % Display boxes in Eyelink
 if EYEBALL

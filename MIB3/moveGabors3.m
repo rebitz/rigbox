@@ -10,14 +10,20 @@ if t_lastFrame > flip_time % time to put up a new frame
         flip = 1;
     end
     
-    textureIdx = t1Mov(flip);
-    Screen('DrawTexture', w, textureIdx,[],t1Rect);
-
-    textureIdx = t2Mov(flip);
-    Screen('DrawTexture', w, textureIdx,[],t2Rect);
+    if tOn(1)
+        textureIdx = t1Mov(flip);
+        Screen('DrawTexture', w, textureIdx,[],t1Rect);
+    end
     
-    textureIdx = t3Mov(flip);
-    Screen('DrawTexture', w, textureIdx,[],t3Rect);
+    if tOn(2)
+        textureIdx = t2Mov(flip);
+        Screen('DrawTexture', w, textureIdx,[],t2Rect);
+    end
+    
+    if tOn(3)
+        textureIdx = t3Mov(flip);
+        Screen('DrawTexture', w, textureIdx,[],t3Rect);
+    end
     
     if fixStillOn
         Screen(w,'FillRect',fixcolor,fixRect); % to keep fix on screen
