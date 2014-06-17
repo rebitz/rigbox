@@ -17,7 +17,7 @@ imageDirectory = strcat(gitDir,splitChar,'express',splitChar,'stimuli');
 imStr = '.JPG';
 
 % p(moving location)
-pMove = 0.05;
+pMove = 0.5; % need the location to move more frequently
 
 % Timing window parameters (s)
 time2fix = 2;

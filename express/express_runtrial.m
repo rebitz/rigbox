@@ -139,12 +139,11 @@ try
     if error_made
         
         %Screen(w,'FillRect',errorColor,errorRect);
-        %errorFeedback = Screen(w,'Flip');
-        
-        while ((GetSecs - errorFeedback) < errorSecs)
-            sampleEye;
-            esc_check;
-        end
+        %errorFeedback = Screen(w,'Flip'); 
+%         while ((GetSecs - errorFeedback) < errorSecs)
+%             sampleEye;
+%             esc_check;
+%         end
         
         correct = 0;
         trialstop = GetSecs();
