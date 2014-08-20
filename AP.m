@@ -3,7 +3,7 @@
 [~,host] = system('hostname');
 host = cellstr(host);
 
-if strcmp(host{1},'dn2lk5n84.stanford.edu')
+if strcmp(host{1},'dn2lk5n84.stanford.edu') || strcmp(host{1},'Beckets-MacBook-Pro.local')
     % enter the path to the git hub directory
     cd('/Users/becket/Documents/MATLAB/pbox');
     compName = 'laptop';
