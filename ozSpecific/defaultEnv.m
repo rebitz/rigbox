@@ -1,7 +1,9 @@
+disp('hi rig Oz!')
+
 global env
 
 % Setup the environment struct - used by many task functions
-env.screenNumber = 0;
+env.screenNumber = 2;
 env.resolution = Screen('Resolution',env.screenNumber);
 env.width = env.resolution.width;
 env.distance = 70; % in cm, monkey from screen

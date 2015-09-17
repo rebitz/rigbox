@@ -2,6 +2,8 @@ flags = NaN;
 nports = 0;
 digOut = NaN;
 
+global ioObj
+
 ioObj = io32;
 status = io32(ioObj);
 if status ~= 0,

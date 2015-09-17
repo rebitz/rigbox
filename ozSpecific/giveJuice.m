@@ -1,7 +1,7 @@
 function giveJuice(nJuice)
 
 % giveJuice
-global io32 env
+global ioObj env
 
 if nargin < 1
     nJuice = env.defaultRwdDrops;
@@ -16,6 +16,4 @@ for juice = 1:nJuice
     io32(ioObj, env.juicePort, base_data_out);
     WaitSecs(env.rwdDelay/1000);
 end
-
-
 

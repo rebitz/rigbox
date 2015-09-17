@@ -213,7 +213,7 @@ function acceptFixation
 % accept trigger code
 Eyelink('AcceptTrigger');
 % Beep:
-sound(sin(1:.4:400));
+% sound(sin(1:.4:400));
 giveJuice;
 % exit the while
 runit = 0;
