@@ -1,11 +1,25 @@
-% set the correct modes, NOT based on user input
+% set the correct modes, based on user input
 
-global EYEBALL TESTING
+if nargin<2
+mode = 'EYE';
+end
 
+global EYEBALL
+if strcmp(mode, 'EYE')
 EYEBALL = 1;
+end
+
+% Is this a test run?
+global TESTING
+if strcmp(mode, 'TEST')
+TESTING = 1;
+EYEBALL = 0;
+else
 TESTING = 0;
+end
 
 ListenChar(2);
+
 
 %% setup and begin to fill the global environmental variables
 % does the dio in defaultEnv 
