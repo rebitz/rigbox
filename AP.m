@@ -1,19 +1,23 @@
-% AP for my laptop or rigF
+% AP for any computer I may use
 
 [~,host] = system('hostname');
 host = cellstr(host);
 
-if strcmp(host{1},'dn2lk5n84.stanford.edu') || strcmp(host{1},'Beckets-MacBook-Pro.local')
-    % enter the path to the git hub directory
-    cd('/Users/becket/Documents/MATLAB/pbox');
-    compName = 'laptop';
-elseif strcmp(host{1}, 'Eddy-PC')
+if strcmp(host{1}, 'Eddy-PC')
+    % path to the github directory
     cd('C:\Users\Eddy\Documents\GitHub\rigbox')
-    compName = 'rigF';
+    compName = 'rigF'; % name of the specific machine
 elseif strcmp(host{1}, 'GB1LPM1')
     cd('C:\Users\User\Documents\rigbox')
     compName = 'rigB';
-else
+elseif strcmp(host{1}, 'buschma-7f6pr52')
+    cd('C:\Users\labadmin\Documents\MATLAB\Becket\rigbox')
+    compName = 'oz';
+elseif strcmp(host{1}, 'buschma-73gqr52')
+    cd('C:\Users\labadmin\Documents\MATLAB\Becket\rigbox')
+    compName = 'space';
+else % it's probably just on my laptop
+    cd('/Users/becket/Documents/MATLAB/pbox');
     compName = 'laptop';
 end
 
