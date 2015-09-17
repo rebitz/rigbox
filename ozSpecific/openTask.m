@@ -72,6 +72,8 @@ if EYEBALL
             % Get origin
             eyeparams.origin = origin;
 
+            Eyelink('Command', strcat('active_eye = ', env.eyeToTrack));
+            Eyelink('Command', strcat('binocular_enabled = ', env.binocularEye));
             Eyelink('Command', 'screen_pixel_coords = %d %d %d %d', ...
                 rect(1), rect(2), rect(3), rect(4) );
             Eyelink('Command', 'link_sample_data = LEFT,RIGHT,GAZE,AREA,PUPIL');
