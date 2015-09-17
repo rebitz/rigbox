@@ -18,7 +18,7 @@ try
     
     % Run the task
     while trialnum < ntrials && continue_running
-                
+        
         MIB3_opentrial; % Initialize a new trial
         MIB3_runtrial;  % Run the trial
         

@@ -3,7 +3,7 @@
 global EYEBALL TESTING
 
 EYEBALL = 1;
-TESTING = 1;
+TESTING = 0;
 
 ListenChar(2);
 
