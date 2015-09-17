@@ -1,22 +1,9 @@
-% set the correct modes, based on user input
+% set the correct modes, NOT based on user input
 
-if nargin<2
-    mode = 'EYE';
-end
+global EYEBALL TESTING
 
-global EYEBALL
-if strcmp(mode, 'EYE')
-    EYEBALL = 1;
-end
-
-% Is this a test run?
-global TESTING
-if strcmp(mode, 'TEST')
-    TESTING = 1;
-    EYEBALL = 0;
-else
-    TESTING = 0;
-end
+EYEBALL = 1;
+TESTING = 0;
 
 ListenChar(2);
 
@@ -26,6 +13,10 @@ ListenChar(2);
 global env w
 defaultEnv;
 
+%% Juicer
+
+setupDIO;
+
 %% Initialize screen and keyboard fns
 
 Screen('CloseAll'); % Screen clear
@@ -34,6 +25,8 @@ warning('off','MATLAB:dispatcher:InexactCaseMatch');
 Screen('Preference','VisualDebugLevel', 0);
 Screen('Preference', 'SuppressAllWarnings', 1);
 Screen('Preference', 'SkipSyncTests',1);
+
+HideCursor();
 
 % Create new window and record size
 [w, rect] = Screen('OpenWindow',env.screenNumber,env.colorDepth/2); % window Idx
@@ -55,6 +48,9 @@ down = KbName('DownArrow');
 shift = KbName('RightShift');
 stopkey = KbName('ESCAPE');
 juicekey = KbName('j');
+onekey = KbName('1!');
+twokey = KbName('2@');
+threekey = KbName('3#');
 
 % Define origin of screen
 origin = [(rect(3) - rect(1))/2 (rect(4) - rect(2))/2];
@@ -80,6 +76,8 @@ if EYEBALL
             % Get origin
             eyeparams.origin = origin;
 
+            Eyelink('Command', strcat('active_eye = ', env.eyeToTrack));
+            Eyelink('Command', strcat('binocular_enabled = ', env.binocularEye));
             Eyelink('Command', 'screen_pixel_coords = %d %d %d %d', ...
                 rect(1), rect(2), rect(3), rect(4) );
             Eyelink('Command', 'link_sample_data = LEFT,RIGHT,GAZE,AREA,PUPIL');
@@ -130,7 +128,6 @@ waitForText = 1.5;
 
 
 %% get full pathdef of data directory since we'll be moving around a lot
-
 dataDirectory
 cd(dataDirectory);
 dataDirectory = pwd;

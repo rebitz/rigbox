@@ -216,10 +216,8 @@ try
         if strcmp(env.rigID,'Oz') || strcmp(env.rigID,'OuterSpace')
             if rewarded
                 juiceTime = markEvent('juice');
-                sound(env.rwdSound,env.soundSF);
+                %sound(env.rwdSound,env.soundSF);
                 giveJuice;
-            else
-                sound(env.norwdSound,env.soundSF);
             end
         elseif strcmp(env.rigID,'RigB')
             if rewarded
