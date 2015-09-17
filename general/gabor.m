@@ -1,13 +1,13 @@
 function im = gabor(vhSize, cyclesPer100Pix, orientation, phase, sigma , mean, amplitude)
 % draw  gabor patch
-% im = gabor(vhSize, cyclesPer100Pix, phase, sigma , mean, amplitude, orientation)
+% im = gabor(vhSize, cyclesPer100Pix, orientation, phase, sigma , mean, amplitude)
 % vhSize: size of pattern, [vSize hSize]
 % cyclesPer100Pix: cycles per 100 pixels
+% orientation: orientation of grating, 0 -> horizontal, 90 -> vertical
 % phase: phase of grating in degree
 % sigma: sigma of gaussian envelope
 % mean: mean color value
 % amplitude: amplitude of color value
-% orientation: orientation of grating, 0 -> horizontal, 90 -> vertical
 %
 % (c) Yukiyasu Kamitani
 %

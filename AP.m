@@ -13,6 +13,8 @@ elseif strcmp(host{1}, 'Eddy-PC')
 elseif strcmp(host{1}, 'GB1LPM1')
     cd('C:\Users\User\Documents\rigbox')
     compName = 'rigB';
+else
+    compName = 'laptop';
 end
 
 files = dir;

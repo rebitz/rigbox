@@ -1,4 +1,6 @@
 function [T1,T2,T3] = generateWalkForBandit3(hazard,ntrials,bounds,stepSize)
+% [T1,T2,T3] = generateWalkForBandit3(hazard,ntrials,bounds,stepSize)
+% 
 % output 3 value vectors that match our requirements
 % 1. bounded at bounds [LB UB], eg [10 90];
 % 2. evens out every 750 [chunk] trials, E(t1) =ish mean(E(t2),E(t3))

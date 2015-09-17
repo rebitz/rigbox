@@ -239,11 +239,11 @@ function setupStimDio % subfunction to open the stimulator
         
         devStr = devices(1).ID;
         
-        % juice port
+        % juice port is 0
         portStr = strcat('port',num2str(env.juicePort),'/line',num2str(env.juiceCh));
         dio.addDigitalChannel(devStr,portStr,'OutputOnly') %0:3 is #1-4
         
-        % microstim port
+        % microstim port is 1
         portStr = strcat('port',num2str(env.stimPort),'/line',num2str(env.stimCh));
         dio.addDigitalChannel(devStr,portStr,'OutputOnly') %0:3 is #1-4
     else

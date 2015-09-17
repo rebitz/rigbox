@@ -198,7 +198,6 @@ while continueRun
 
     if ~errorMade
         juiceT = giveJuice();
-        
     end
     
     % clear the screen

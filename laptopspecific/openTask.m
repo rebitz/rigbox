@@ -1,4 +1,4 @@
-% set the correct modes, based on user input
+% set the correct modes, NOT based on user input
 
 global EYEBALL TESTING
 
@@ -22,6 +22,8 @@ Screen('Preference','VisualDebugLevel', 0);
 Screen('Preference', 'SuppressAllWarnings', 1);
 Screen('Preference', 'SkipSyncTests',1);
 
+HideCursor();
+
 % Create new window and record size
 [w, rect] = Screen('OpenWindow',env.screenNumber,env.colorDepth/2); % window Idx
 [env.screenWidth, env.screenHeight] = WindowSize(w);
@@ -42,6 +44,9 @@ down = KbName('DownArrow');
 shift = KbName('RightShift');
 stopkey = KbName('ESCAPE');
 juicekey = KbName('j');
+onekey = KbName('1!');
+twokey = KbName('2@');
+threekey = KbName('3#');
 
 % Define origin of screen
 origin = [(rect(3) - rect(1))/2 (rect(4) - rect(2))/2];
