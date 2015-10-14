@@ -11,7 +11,7 @@ if IsOSX
 else
     splitChar = '\';
 end
-dataDirectory = strcat(gitDir,splitChar,'MGS',splitChar,'data');
+dataDirectory = strcat(gitDir,splitChar,'train',splitChar,'data');
 
 % Background color
 bgcolor = [127 127 127];
