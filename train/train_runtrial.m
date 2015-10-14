@@ -1,4 +1,4 @@
-% posner_runtrial.m
+% train_runtrial.m
 % Runs a posner cued target trial based on the parameters specified
 
 try
@@ -124,12 +124,13 @@ try
         
         if ~acquired
             
-            error_made = 1; % see if he's still fixing
             fixed = checkFix(origin, fix_err, space);
             
-            if fixed
+            if fixed && ~error_made
+                error_made = 1; % see if he's still fixing
                 errortype = 4;  % Didn't move eyes
-            else
+            elseif ~error_made
+                error_made = 1; % see if he's still fixing
                 errortype = 5;  % Didn't choose targ
             end
             
@@ -166,6 +167,7 @@ try
     % Some type of error in the trial
     if error_made
         
+        errortype
         if ~isnan(errortype)
             Screen(w,'FillRect',errorColor,errorRect);
             errorFeedback = Screen(w,'Flip');

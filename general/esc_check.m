@@ -1,5 +1,7 @@
 % esc_check.m
 
+% global w env error_made errortype
+
 if ~exist('stopkey')
     stopkey = KbName('ESCAPE');
 end
@@ -12,6 +14,10 @@ if ~exist('pausekey')
     pausekey = KbName('p');
 end
 
+if ~exist('space')
+    space = KbName('SPACE');
+end
+
 [keyIsDown, secs, keyCode] = KbCheck;
 
 if keyCode(stopkey)
@@ -20,8 +26,8 @@ if keyCode(stopkey)
     error_made = 1; errortype = NaN;
 elseif keyCode(pausekey)
     paused = 1; disp('PAUSED! Press the space bar to continue.');
-    error_made = 1; errortype = NaN;
     Screen(w,'FillRect',env.colorDepth/2); Screen(w,'Flip');
+    error_made = 1; errortype = NaN;
     while paused
         [keyIsDown, secs, keyCode] = KbCheck;
         if keyCode(space)

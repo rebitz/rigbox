@@ -88,7 +88,7 @@ try
         while ((GetSecs - cueoffT) < targGap) && fixed
             fixed = checkFix(origin, fix_err, space);
             
-            if ~fixed
+            if ~fixed && ~error_made
                 error_made = 1;
                 errortype = 3; % broken fixation during overlap
             end
@@ -140,7 +140,7 @@ try
             end
         end
         
-        if ~choiceMade
+        if ~choiceMade && ~error_made
             error_made = 1;
             if fixed
                 errortype = 4;  % Didn't move eyes
@@ -160,10 +160,10 @@ try
             
             held = checkFix(curTargOri, targ_err, curTargKey);
             
-            if ~held
+            if ~held && ~error_made
                 error_made = 1;
                 errortype = 6;  % broke targ fixation
-            else
+            elseif ~error_made
                 sampleEye;
                 esc_check;
             end
@@ -228,7 +228,7 @@ try
             giveJuice;
         else
             juiceTime = GetSecs();
-            sound(env.norwdSound, env.soundSF);
+            if ~EYEBALL; sound(env.norwdSound, env.soundSF); end
         end
         
     end

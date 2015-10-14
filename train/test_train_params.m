@@ -1,12 +1,12 @@
 % for this specific monkey, set some additional parameters
 
 % WHAT MODE ARE WE IN?
-fixationMode = 0;
+fixationMode = 1;
 targetMode = 1; % targ on at all?
     % this guy supercedes all that come below it
 overlapMode = 0; % targ on before fix off?
 targOnAfterGo = 1; % have the target on at fix off go cue?
-memoryMode = 1; % turn targ off at any point before fix off?
+memoryMode = 0; % turn targ off at any point before fix off?
     % if this is set to 1, then there is an overlap by default
 
 pJackpot = 0.1;

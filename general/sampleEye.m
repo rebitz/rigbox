@@ -1,6 +1,10 @@
 global samples
 
-esc_check;
+if ~exist('fixChecking') || ~fixChecking
+    esc_check;
+elseif fixChecking
+    simple_esc_check;
+end
 
 if EYEBALL
         

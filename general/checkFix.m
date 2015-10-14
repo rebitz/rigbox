@@ -4,6 +4,8 @@
 
 function fixed = checkFix(object, err, key)
 
+fixChecking = 1;
+
 global TESTING EYEBALL
 
 fixed = 0;
@@ -23,7 +25,7 @@ end
 
 if ~TESTING && EYEBALL
         
-    esc_check;
+    simple_esc_check;
         
     sampleEye;
         
@@ -50,5 +52,7 @@ if ~TESTING && EYEBALL
     end
     
 end
+
+fixChecking = 0;
 
 end
