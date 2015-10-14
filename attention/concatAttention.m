@@ -101,7 +101,7 @@ behOI = 'bestChoice';
 
 smoothBy = 1;
 nSince = 50;
-nBefore = 10;
+nBefore = 50;
 
 firsts = find([out.trialSince]==0);
 runs = NaN(length(firsts),nSince+nBefore+1);

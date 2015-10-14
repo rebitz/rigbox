@@ -54,6 +54,7 @@ rng('shuffle');
 % platform on all platforms in order to make this script portable:
 KbName('UnifyKeyNames');
 space = KbName('SPACE');
+pausekey = KbName('p');
 esc = KbName('ESCAPE');
 right = KbName('RightArrow');
 left = KbName('LeftArrow');

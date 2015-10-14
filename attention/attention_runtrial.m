@@ -22,39 +22,40 @@ try
     
     sampleEye;  % (does nothing if EYEBALL)
     
-    % Fixation onset
-    Screen(w,'FillRect',fixcolor,fixRect);
-    
-    fixon = Screen(w,'Flip');
-    
-    sampleEye;
-    
-    % Wait for fixation
-    fixed = 0;
-    while (GetSecs - fixon) < time2fix && ~fixed
-        fixed = checkFix(origin, fix_err, space);
-        esc_check;
-    end
-    
-    % If fixation acquired, record time of acquisition
-    if fixed
-        fixacq = GetSecs;
-    else
-        fixacq = 0;
-        error_made = 1;
-        errortype = 1;  % no fixation
-    end
-    
-    % Hold fixation
-    while ((GetSecs - fixacq) < fixHold) && fixed
-        fixed = checkFix(origin, fix_err, space);        
-        if ~fixed
-            error_made = 1;
-            errortype = 2;  % broken fixation
+    % Fixation onset block
+    if ~error_made
+        Screen(w,'FillRect',fixcolor,fixRect);
+        fixon = Screen(w,'Flip');
+
+        sampleEye;
+
+        % Wait for fixation
+        fixed = 0;
+        while (GetSecs - fixon) < time2fix && ~fixed && ~error_made
+            fixed = checkFix(origin, fix_err, space);
+            esc_check;
         end
+
+        % If fixation acquired, record time of acquisition
+        if fixed && ~error_made
+            fixacq = GetSecs;
+        elseif ~error_made
+            fixacq = 0;
+            error_made = 1;
+            errortype = 1;  % no fixation
+        end
+
+        % Hold fixation
+        while ((GetSecs - fixacq) < fixHold) && fixed && ~error_made
+            fixed = checkFix(origin, fix_err, space);        
+            if ~fixed
+                error_made = 1;
+                errortype = 2;  % broken fixation
+            end
+        end
+
+        sampleEye;
     end
-    
-    sampleEye;
     
     if ~error_made && cueing % put up the cue stuff
         
@@ -206,6 +207,8 @@ try
         elseif errortype == 6 % Broke target fixation
             
             % CODE FOR BROKE TARG FIX
+            
+        elseif isnan(errortype) % PAUSED by experimenter
             
         end
         errortype
