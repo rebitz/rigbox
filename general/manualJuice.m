@@ -36,10 +36,10 @@ function localEnv
 
     % setup keyboard
     if ~exist('stopkey') % set defaults in case not set above
-        env.stopkey = KbName('space');
+        env.stopkey = KbName('ESCAPE');
     end
 
     if ~exist('juicekey')
-        env.juicekey = KbName('j');
+        env.juicekey = KbName('SPACE');
     end
 end
