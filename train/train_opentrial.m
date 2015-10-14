@@ -39,18 +39,6 @@ targR = tOffsets(tmp(1));
 targOrigin = [t1x,t1y]+origin;
 targRect = [targOrigin-targSize/2 targOrigin+targSize/2];
 
-% % send target information to serial port
-% a(1) = mod(targTh,256);
-% a(2) = floor(targTh ./ 256);
-% a(3) = targR;
-% 
-% fwrite(port,a);
-
-% on plexon's end:
-% a(1) = a(1) + a(2).*256;
-% data(start+trial).targLoc = a(1);
-% data(start+trial).targEcc = a(3);
-
 % Increment trialnum
 trialnum = trialnum + 1;
 disp(num2str(trialnum))
@@ -72,10 +60,8 @@ if EYEBALL
     
     Eyelink('command', 'clear_screen %d', 0);
     Eyelink('command', 'draw_cross %d %d 15', env.screenWidth/2, env.screenHeight/2);
-    Eyelink('command', 'draw_box %d %d %d %d 15', round(fixRect(1)), round(fixRect(2)), round(fixRect(3)), round(fixRect(4)));
-    
+    Eyelink('command', 'draw_box %d %d %d %d 15', round(fixRect(1)), round(fixRect(2)), round(fixRect(3)), round(fixRect(4)));    
     Eyelink('command', 'draw_box %d %d %d %d 15',...
         round(targRect(1)), round(targRect(2)), round(targRect(3)), round(targRect(4)));
 
-    
 end

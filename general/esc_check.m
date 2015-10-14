@@ -17,9 +17,11 @@ end
 if keyCode(stopkey)
     keep_waiting = 0;
     continue_running = 0;
+    error_made = 1; errortype = NaN;
 elseif keyCode(pausekey)
     paused = 1; disp('PAUSED! Press the space bar to continue.');
     error_made = 1; errortype = NaN;
+    Screen(w,'FillRect',env.colorDepth/2); Screen(w,'Flip');
     while paused
         [keyIsDown, secs, keyCode] = KbCheck;
         if keyCode(space)

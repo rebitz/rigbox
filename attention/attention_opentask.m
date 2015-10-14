@@ -1,69 +1,9 @@
-% posner_opentask.m
-% Initializes the screen for the posner task, the data output, and the
-% target stimuli used throughout the task
-
-% Initialize trial number
-trialnum = 0;
-
-% Flag to keep running task
-continue_running = 1;
+% attention_opentask;
 
 % Set the ITI for the first trial.
 iti = itimin + (itimin - itimax) .* rand(1,1);
 
 %% Ensure output
-
-% Initialize outputs
-global task_data;
-task_data = struct();
-global trial_data;
-trial_data = struct([]);
-
-% Connection with Eyelink if not in testing mode
-if EYEBALL
-    try,       
-        if Eyelink('IsConnected') ~= 1
-            disp('Trying to connect to Eyelink, attempt #1(/2):');
-            r = Eyelink('Initialize');
-            if r ~= 0
-                WaitSecs(.5) % wait half a sec and try again
-                disp('Trying to connect to Eyelink, attempt #2(/2):');
-                r = Eyelink('Initialize');
-            end
-        elseif Eyelink('IsConnected') == 1
-            r = 0; % means OK initialization
-        end
-
-        if r == 0;
-            disp('Eyelink successfully initialized!')
-            % Get origin
-            eyeparams.origin = origin;
-
-            Eyelink('Command', 'screen_pixel_coords = %d %d %d %d', ...
-                rect(1), rect(2), rect(3), rect(4) );
-            Eyelink('Command', 'link_sample_data = LEFT,RIGHT,GAZE,AREA,PUPIL');
-            edfname = 'ef.edf';
-            Eyelink('openfile',edfname);
-
-            % Calibrate tracker
-            Eyelink('StartSetup');
-            Eyelink('DriftCorrStart', origin(1), origin(2));
-            Eyelink('ApplyDriftCorr');
-
-            % Start of the task
-            taskstart = GetSecs;
-        elseif r ~= 0
-            % If Eyelink can't initialize: report error and quit
-            disp('Eyelink failed to initialize, check connections');
-            continue_running = 0;
-        end
-
-    catch
-        % If Eyelink can't initialize: report error and quit
-        disp('Eyelink failed to initialize, check connections');
-        continue_running = 0;
-    end
-end
 
 % Name datafile in case it was forgotten
 if ~exist('filename')

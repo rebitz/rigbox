@@ -5,24 +5,8 @@ iti = itimin + (itimin - itimax) .* rand(1,1);
 
 %% Ensure output
 
-% % open serial write port:
-% port = serial('COM1','BaudRate',115200);
-% try,
-%     fopen(port);
-% catch
-%     disp('some ports still open, closing them now')
-%     delete(instrfindall);
-%     port = serial('COM1','BaudRate',115200);
-%     fopen(port);
-% end
-
-% Name datafile in case it was forgotten
-if ~exist('filename')
-    disp('Subject name not provided, using unnamed as name')
-    subject = sprintf('unnamed');
-else
-    subject = filename;
-end;
+subject = subjname;
+filename = strcat(subjname,datestr(now,'mmddyy'));
 
 % Create directory where data will be stored
 filestart = filename;

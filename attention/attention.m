@@ -12,7 +12,7 @@ try
     ListenChar(2);
     
     attention_params;    % Load the parameters
-    openTask; % general rig specific
+    openTask; % general rig specific    
     attention_opentask;  % Open the task
     
     % Run the task

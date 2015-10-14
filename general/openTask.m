@@ -143,6 +143,7 @@ waitForText = 1.5;
 
 
 %% get full pathdef of data directory since we'll be moving around a lot
+
 dataDirectory
 cd(dataDirectory);
 dataDirectory = pwd;
