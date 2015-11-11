@@ -15,6 +15,7 @@ KbName('UnifyKeyNames');
 % set defaults
 fixSize = 6;
 useFaces = 1;
+nJuices = 10;
 fixErr = 2;
 fixColor = repmat(max(env.colorDepth)*1,1,3); % bright fix
 bgColor = repmat(max(env.colorDepth)/3,1,3); % dark bg
@@ -31,14 +32,18 @@ disp('dio open');
 prepareEnv; % open the screen, eyelink connectionk, etc
 disp('environment initialized');
 
+home = 'C:\Users\labadmin\Documents\MATLAB\Becket\rigbox';
+cd(home);
+
 % image directory
-imageDirectory = strcat(pwd,'/stimuli/');
+imageDirectory = strcat(pwd,'\stimuli\');
 imStr = '.png';
 
 % get a list of image names
 cd(imageDirectory)
 files = dir;
 idx = ~cellfun(@isempty,strfind({files.name},imStr));
+idx = and(idx,cellfun(@isempty,strfind({files.name},'._')));
 imageList = {files(idx).name};
 imageIdx = [1:length(imageList)];
 
@@ -195,9 +200,9 @@ end
 
 function escStimCheck
     [keyIsDown, secs, keyCode] = KbCheck;
-    if keyCode(env.juicekey);
+    if keyCode(env.juicekey) && fixOnTrue
         count = 1;
-        while count < 10
+        while count < nJuices
             try,
                 giveJuice;
             catch
