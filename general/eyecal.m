@@ -107,9 +107,9 @@ fixShape  = [-6 -8; ...
 fixShape2 = [-5 -7; ...
              5  7];
 targShape = [-8 -8; ...
-             8  8];
+             8  8].*3;
 fixRect = shiftPoints(fixShape, const.screenCenter)';
-fixRect = fixRect(:)';
+fixRect = fixRect(:)'
 fixRect2 = shiftPoints(fixShape2, const.screenCenter)';
 fixRect2 = fixRect2(:)';
 
@@ -214,7 +214,11 @@ function acceptFixation
 Eyelink('AcceptTrigger');
 % Beep:
 % sound(sin(1:.4:400));
-giveJuice;
+count = 1;
+while count < 10
+    giveJuice;
+    count = count+1;
+end
 % exit the while
 runit = 0;
 
