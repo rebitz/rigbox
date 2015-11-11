@@ -16,7 +16,7 @@ KbName('UnifyKeyNames');
 fixSize = 6;
 useFaces = 1;
 nJuices = 10;
-fixErr = 2;
+fixErr = 2; % unused
 fixColor = repmat(max(env.colorDepth)*1,1,3); % bright fix
 bgColor = repmat(max(env.colorDepth)/3,1,3); % dark bg
 EYEBALL = 0;
@@ -186,7 +186,7 @@ function prepareEnv
     end
 
     if ~exist('waitkey')
-        env.waitkey = KbName('RightArrow');
+        env.waitkey = KbName('return');
     end
     
     if ~exist('stimkey')
