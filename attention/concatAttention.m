@@ -66,42 +66,36 @@ length(out)
 
     
 %% first, we just make sure there's some evidence of learning
-
-behOI = 'rewarded';
-behOI = 'bestChoice';
-
-smoothBy = 5;
-
-figure(); hold on;
-plot(gsmooth([out.(behOI)],smoothBy))
-plot([out.trialSince]==0,'.k')
-
-% trying to calculate chance = p(stim)*p(rwd|stim)
-
-% random seed -> since we've discretized orientations, the chance value
-% depends on the precise value of the seed relative to orientation opts
-rwdSeed = orientationBounds(1) + rand*range(orientationBounds);
-
-% now the probability for choosing each target
-radSeed = (rwdSeed/90)*pi;
-radOrientations = (orientationSeeds/90)*pi;
-angDist = abs(mod((radSeed-radOrientations) + pi, pi*2) - pi);
-theseRwds = rwdScale*exp(-((angDist.^2)/(2*rwdStd.^2)));
-
-% figure(); plot(orientationSeeds,theseRwds)
-chance = nanmean(theseRwds)
-
-h = line([0 length(out)],[chance chance]);
-set(h,'Color','k')
-
-%% now, align everything to the first trial after a change, attempt learning curves
+%% align everything to the first trial after a change, attempt learning curves
 
 behOI = 'rewarded';
 behOI = 'bestChoice';
 
 smoothBy = 1;
-nSince = 50;
-nBefore = 50;
+nSince = 30;
+nBefore = 20;
+
+% trying to calculate chance = p(stim)*p(rwd|stim)
+if strcmp(behOI,'rewarded')
+    % random seed -> since we've discretized orientations, the chance value
+    % depends on the precise value of the seed relative to orientation opts
+    rwdSeed = orientationBounds(1) + rand*range(orientationBounds);
+
+    % now the probability for choosing each target
+    radSeed = (rwdSeed/90)*pi;
+    radOrientations = (orientationSeeds/90)*pi;
+    angDist = abs(mod((radSeed-radOrientations) + pi, pi*2) - pi);
+    if exist(rwdScale)
+        theseRwds = rwdScale*exp(-((angDist.^2)/(2*rwdStd.^2)));
+    else
+        theseRwds = (maxRwd-minRwd)*exp(-((angDist.^2)/(2*rwdStd.^2)))+minRwd;
+    end
+
+    % figure(); plot(orientationSeeds,theseRwds)
+    chance = nanmean(theseRwds);
+else
+    chance = 1/length(nanunique([out.chosenTarg]));
+end
 
 firsts = find([out.trialSince]==0);
 runs = NaN(length(firsts),nSince+nBefore+1);
@@ -111,7 +105,8 @@ for tr = 1:length(firsts)
     idx = [firsts(tr)-nBefore:firsts(tr)+nSince];
     validTrNums = find(and(idx>0,idx<length(out))); % first, select valid trial numbers
     idx = idx(validTrNums); % translate back into trial numbers
-    selex = [out(idx).rwdBlock] <= out(firsts(tr)).rwdBlock;
+    selex = or([out(idx).rwdBlock] == out(firsts(tr)).rwdBlock,...
+        [out(idx).rwdBlock] == out(firsts(tr)).rwdBlock-1);
     idx = idx(selex); keeps = validTrNums(selex);
     
     tmp = out(idx);
@@ -129,4 +124,19 @@ plot(xpos,m-e,'--')
 
 h = line([min(xpos) max(xpos)],[chance chance]);
 h(2) = line([0 0],[0 .9]);
+set(h,'Color','k')
+
+%% whole session plot:
+
+behOI = 'rewarded';
+behOI = 'bestChoice';
+
+smoothBy = 5;
+
+figure(); hold on;
+plot(gsmooth([out.(behOI)],smoothBy))
+plot([out.trialSince]==0,'.k')
+
+
+h = line([0 length(out)],[chance chance]);
 set(h,'Color','k')

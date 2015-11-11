@@ -16,7 +16,7 @@ contrastBounds = [.2 .5];
 contrastLevels = 3; % n pts btw
 
 % p(switch in reward anchor)
-hazard = 0.25; % this rides on top of the rwd buffer below
+hazard = 0.2; % this rides on top of the rwd buffer below
 % i.e. | rwdBuffer check, this is the hazard rate
 minJump = 45; % in dg
 
@@ -31,8 +31,9 @@ trSinceMin = 20;
 % trSinceMin = 5;
 
 % reward distribution - check out illustrateAttnRwds to get a sense of this
-rwdStd = pi/6; % in radians
-rwdScale = 1; % maxtrwd ish
+rwdStd = pi/7; % in radians
+maxRwd = 1; % max rwd
+minRwd = 0.1; % max rwd
 
 % fixed gabor stuff
 % gabor(vhSize, cyclesPer100Pix, orientation, phase, sigma , mean, amplitude);

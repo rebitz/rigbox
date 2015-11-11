@@ -102,7 +102,7 @@ targRect = [targOrigin targOrigin] + repmat([-targW -targH targW targH],nTargs,1
 radSeed = (rwdSeed/(range(orientationBounds)/2))*pi;
 radOrientations = (theseOrientations/(range(orientationBounds)/2))*pi;
 angDist = abs(mod((radSeed-radOrientations) + pi, pi*2) - pi);
-theseRwds = rwdScale*exp(-((angDist.^2)/(2*rwdStd.^2)));
+theseRwds = (maxRwd-minRwd)*exp(-((angDist.^2)/(2*rwdStd.^2)))+minRwd;
 
 % Increment trialnum
 trialnum = trialnum + 1;
