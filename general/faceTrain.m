@@ -33,7 +33,7 @@ disp('environment initialized');
 
 % image directory
 imageDirectory = strcat(pwd,'/stimuli/');
-imStr = '.JPG';
+imStr = '.png';
 
 % get a list of image names
 cd(imageDirectory)
