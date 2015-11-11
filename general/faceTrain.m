@@ -186,7 +186,7 @@ function prepareEnv
     end
 
     if ~exist('waitkey')
-        env.waitkey = KbName('space');
+        env.waitkey = KbName('RightArrow');
     end
     
     if ~exist('stimkey')
@@ -194,7 +194,7 @@ function prepareEnv
     end
     
     if ~exist('juicekey')
-        env.juicekey = KbName('j');
+        env.juicekey = KbName('space');
     end
 end
 
@@ -229,6 +229,8 @@ function closeTask
     % screen clear
     sca;
     commandwindow;
+    
+    cd(home)
     
 end
 
