@@ -1,10 +1,5 @@
 function faceTrain(monk)
 %
-% put up a fixation cross and run some stim pulses
-% -- plot the output by default to see the saccades generated
-% -- returns mean endpoint location of stimulated saccades [th,rho]
-% takes inputs filename, location of hole, depth (from brain 0)
-
 % first parse inputs
 filename = strcat(monk,'_',datestr(now,'ddmmyyyy_HHMM'));
 
@@ -13,13 +8,12 @@ global env juiceCount; defaultEnv;
 KbName('UnifyKeyNames');
 
 % set defaults
-fixSize = 6;
-useFaces = 1;
-nJuices = 10;
-fixErr = 2; % unused
+fixSize = 10;
+useFaces = 1; % at all?
+pNotFace = 0;
+nJuices = 5;
 fixColor = repmat(max(env.colorDepth)*1,1,3); % bright fix
 bgColor = repmat(max(env.colorDepth)/3,1,3); % dark bg
-EYEBALL = 0;
 
 % initialize vars
 tNum = 1;
@@ -32,35 +26,18 @@ disp('dio open');
 prepareEnv; % open the screen, eyelink connectionk, etc
 disp('environment initialized');
 
-home = 'C:\Users\labadmin\Documents\MATLAB\Becket\rigbox';
-cd(home);
-
-% image directory
-imageDirectory = strcat(pwd,'\stimuli\');
-imStr = '.png';
-
-% get a list of image names
-cd(imageDirectory)
-files = dir;
-idx = ~cellfun(@isempty,strfind({files.name},imStr));
-idx = and(idx,cellfun(@isempty,strfind({files.name},'._')));
-imageList = {files(idx).name};
-imageIdx = [1:length(imageList)];
-
-trials = ([]);
-
 while continueRun
 
     if ~continueRun; break; end
     
     % initialize trial stuff
-    juiceCount = 0;
+    juiceCount = 0; nFlips = 0; firstFixOnT = NaN;
     
     % load the chosen stimulus, make the texture
     tmp = Shuffle(imageIdx);
     imName = imageList{tmp(1)};
     back = pwd;
-    cd(imageDirectory)
+    cd(env.imageDirectory)
     img = imread(imName);
     cd(back)
     imgIndx = Screen('MakeTexture', w, img);
@@ -73,10 +50,10 @@ while continueRun
         
         if fixGo && ~fixOnTrue
             % Fixation onset
-            if useFaces
-                Screen(w,'DrawTexture',imgIndx,[],fixRect);
-            else
+            if ~useFaces || rand < pNotFace
                 Screen(w,'FillRect',fixColor,fixRect)
+            else
+                Screen(w,'DrawTexture',imgIndx,[],fixRect);
             end
             flipT = Screen(w,'Flip');
             while (GetSecs - flipT) < 0.15
@@ -84,6 +61,8 @@ while continueRun
             end
             fixOnTrue = true;
             fixGo = 0;
+            if ~isnan(firstFixOnT); firstFixOnT = flipT; end
+            nFlips = nFlips+1;
         elseif fixGo && fixOnTrue
             Screen(w,'FillRect',bgColor)
             flipT = Screen(w,'Flip');
@@ -107,6 +86,10 @@ while continueRun
     
     % save the filedata
     trials.juiceCount = juiceCount;
+    trials.nFlips = nFlips;
+    trials.imageName = imName;
+    trials.firstFixOnT = firstFixOnT;
+    trials.trialEnd = screenClearT;
     
     % setup the next trial
     tNum = tNum+1;
@@ -157,6 +140,9 @@ function prepareEnv
     % Define origin of screen
     origin = [(rect(3) - rect(1))/2 (rect(4) - rect(2))/2];
 
+    % sounds, if necessary
+    makeAudioFeedback;
+
     % Reseed random
     rng('shuffle');
     
@@ -166,27 +152,37 @@ function prepareEnv
     % Setup stimuli and fixation rects
     fixSize = deg2px(fixSize, env)./2;
     fixRect = [origin origin] + [-fixSize -fixSize fixSize fixSize];
-    fixErr = deg2px(fixErr, env)./2;
 
-    % Now for images
-    
-    %%
-    %%%%
-    %%%%
-    %%%% PAY ATTENTION!!!!
-    env.dataDir = pwd;% 'C:\Users\User\Documents\GitHub\rigbox\stimTest\data';
-    %%%%
-    %%%%
-    %%%%
-    %%
+    % set a home directory somewhere
+    env.home = pwd;
+    cd(env.home);
+
+    % image directory
+    if IsOSX
+        env.splitChar = '/';
+    else
+        env.splitChar = '\';
+    end
+    env.imageDirectory = strcat(env.home,env.splitChar,'stimuli');
+    env.imStr = '.png';
+
+    % get a list of image names
+    cd(env.imageDirectory)
+    files = dir;
+    idx = ~cellfun(@isempty,strfind({files.name},env.imStr));
+    idx = and(idx,cellfun(@isempty,strfind({files.name},'._')));
+    imageList = {files(idx).name};
+    imageIdx = [1:length(imageList)];
+
+    env.dataDir = strcat(env.home,env.splitChar,'train',env.splitChar,'data');
     
     % setup keyboard
     if ~exist('stopkey') % set defaults in case not set above
-        env.stopkey = KbName('escape');
+        env.stopkey = KbName('ESCAPE');
     end
 
     if ~exist('waitkey')
-        env.waitkey = KbName('return');
+        env.waitkey = KbName('Return');
     end
     
     if ~exist('stimkey')
@@ -196,6 +192,19 @@ function prepareEnv
     if ~exist('juicekey')
         env.juicekey = KbName('space');
     end
+    
+    % now fill out and save our taskdata stuff, now we've got it all
+    taskdata = env;
+    vars = who; 
+    for i = 1:length(vars)
+        if exist(vars{i},'var') && ~isempty(vars{i}) && ...
+                ~strcmp(vars{i},'ans') && ~strcmp(vars{i},'env')
+            taskdata.(vars{i}) = eval(vars{i});
+        end
+    end
+    cd(env.dataDir);
+    save(strcat(filename,'_taskdata'),'taskdata');
+    cd(env.home);
 end
 
 function escStimCheck
@@ -203,11 +212,11 @@ function escStimCheck
     if keyCode(env.juicekey) && fixOnTrue
         count = 1;
         while count < nJuices
-            try,
+%             try,
                 giveJuice;
-            catch
-                disp('tried to juice')
-            end
+%             catch
+%                 disp('tried to juice')
+%             end
             count = count+1;
         end
         juiceCount = juiceCount+1;
@@ -222,15 +231,49 @@ function escStimCheck
     end
 end
 
+function makeAudioFeedback
+    for sounds = 1:2
+        switch sounds
+            case 1
+                cf = [440 523.25 698.46];   % rising 3 notes
+            case 2
+                cf = [440 220 220]; % falling 2 notes;
+        end
+
+        sf = 22050;                 % sample frequency (Hz)
+        d = .1;                     % duration - each tone (s)
+        n = sf * d;                 % number of samples
+        stmp = (1:n) / sf;             % sound data preparation
+
+        s = [];
+        for i = 1:length(cf)
+            s = [s sin(2 * pi * cf(i) * stmp)];   % sinusoidal modulation
+        end
+
+    %   sound(s, sf);               % sound presentation
+
+        switch sounds
+            case 1
+                env.rwdSound = s;   % rising 3 notes
+            case 2
+                env.norwdSound = s;   % falling 2 notes
+        end
+    end
+    env.soundSF = sf;
+end
+
 function closeTask
 
-    % closeDio stuff
+    % save trials
+    cd(env.dataDir);
+    save(filename,'trials');
+    cd(env.home);
     
     % screen clear
     sca;
     commandwindow;
     
-    cd(home)
+    cd(env.home)
     
 end
 
