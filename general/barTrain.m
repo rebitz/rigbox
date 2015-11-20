@@ -1,19 +1,29 @@
-function faceTrain(monk)
+function barTrain(monk)
 %
 % first parse inputs
-filename = strcat(monk,'_',datestr(now,'ddmmyyyy_HHMM'));
+filename = strcat(monk,'_','barTrain','_',datestr(now,'ddmmyyyy_HHMM'));
 
 % make a default environment!!!
 global env juiceCount; defaultEnv;
 KbName('UnifyKeyNames');
 
 % set defaults
-fixSize = 10;
-useFaces = 1; % at all?
-pNotFace = 0;
+% stimuli/display?
+fullScreen = 1; % full screen color?
+    % else:
+    fixSize = 10;
+cueGoTime = 1; % else, put up the cue after release
+goColor = [1 1 1]; % white
+noGoColor = [.5 .5 .5]; % gray
+bgColor = [0 0 0];
+
+% timings?
+tToGo = 2;
+tToHold = 1;
+tWaitInGo = 2;
+
+% others?
 nJuices = 5;
-fixColor = repmat(max(env.colorDepth)*1,1,3); % bright fix
-bgColor = repmat(max(env.colorDepth)/3,1,3); % dark bg
 
 % initialize vars
 tNum = 1;
@@ -31,72 +41,68 @@ while continueRun
     if ~continueRun; break; end
     
     % initialize trial stuff
-    juiceCount = 0; nFlips = 0; firstFixOnT = NaN;
-    
-    % load the chosen stimulus, make the texture
-    tmp = Shuffle(imageIdx);
-    imName = imageList{tmp(1)};
-    back = pwd;
-    cd(env.imageDirectory)
-    img = imread(imName);
-    cd(back)
-    imgIndx = Screen('MakeTexture', w, img);
+    juiceCount = 0; goOnTrue = false; barDown = false; released = false;
 
-    disp('ready for fixation, press "t" to display');
-    waiting = 1; fixOnTrue = false;
+    disp('new trial!');
+    
+    waiting = 1;
     while waiting % main body of the code
         
-        escStimCheck;
+        Screen(w,'FillRect',bgColor)
+        Screen(w,'FillRect',noGoColor,fixRect)
+        flipT1 = Screen(w,'Flip');
         
-        if fixGo && ~fixOnTrue
-            % Fixation onset
-            if ~useFaces || rand < pNotFace
-                Screen(w,'FillRect',fixColor,fixRect)
-            else
-                Screen(w,'DrawTexture',imgIndx,[],fixRect);
+        while (GetSecs() - flipT1) < tToGo && ~barDown
+            escStimCheck;
+            barDown = bitand(env.leverBitMask, io32(ioObj, env.juicePort+1));
+            if barDown
+                initializeT = GetSecs();
+                goOnTrue = true; % allow manual juicing
             end
-            flipT = Screen(w,'Flip');
-            while (GetSecs - flipT) < 0.15
-                escStimCheck;
-            end
-            fixOnTrue = true;
-            fixGo = 0;
-            if ~isnan(firstFixOnT); firstFixOnT = flipT; end
-            nFlips = nFlips+1;
-        elseif fixGo && fixOnTrue
-            Screen(w,'FillRect',bgColor)
-            flipT = Screen(w,'Flip');
-            while (GetSecs - flipT) < 0.2
-                escStimCheck;
-            end
-            fixGo = 0;
-            fixOnTrue = false;
         end
         
+        while (GetSecs() - flipT1) < tToHold && barDown
+            escStimCheck;
+            barDown = bitand(env.leverBitMask, io32(ioObj, env.juicePort+1));
+        end
+        
+        if cueGoTime && barDown % if we're telling him when to go
+            Screen(w,'FillRect',bgColor)
+            Screen(w,'FillRect',goColor,fixRect)
+            flipT2 = Screen(w,'Flip');
+        end
+        
+        while (GetSecs() - flipT2) < tWaitInGo && ~released && barDown
+            escStimCheck;
+            released = ~bitand(env.leverBitMask, io32(ioObj, env.juicePort+1));
+            if released
+                responseT = GetSecs();
+            end
+        end
+    
         % clear the screen
         Screen(w,'FillRect',bgColor)
         screenClearT = Screen(w,'Flip');
+        goOnTrue = false;
 
         %% close out the trial
-
-        WaitSecs(0.2);
-
         % save the filedata
         trials(tNum).juiceCount = juiceCount;
-        trials(tNum).nFlips = nFlips;
-        trials(tNum).imageName = imName;
-        trials(tNum).firstFixOnT = firstFixOnT;
+        trials(tNum).trialStartT = flipT1;
+        trials(tNum).goCueT = flipT2;
+        trials(tNum).t2initialize = initializeT;
+        trials(tNum).releasedLogical = released;
+        trials(tNum).responseT = responseT;
         trials(tNum).trialEnd = screenClearT;
 
         % setup the next trial
         tNum = tNum+1;
     end
+    
     if ~continueRun; break; end
- 
 end
 
 % close out the task
-
 closeDIO;
 closeTask;
 
@@ -145,34 +151,35 @@ function prepareEnv
     % Reseed random
     rng('shuffle');
     
+    % parallel port for reading the bar press?
+    env.leverBit = 7; % from redgreen
+    env.leverBitMask = uint16(bitset(0, env.leverBit, 1));
+    
     % initialize trials struct
     trials = ([]);
     
     % Setup stimuli and fixation rects
     fixSize = deg2px(fixSize, env)./2;
-    fixRect = [origin origin] + [-fixSize -fixSize fixSize fixSize];
+    if ~fullScreen
+        fixRect = [origin origin] + [-fixSize -fixSize fixSize fixSize];
+    else
+        fixRect = rect;
+    end
+
+    goColor = max(env.colorDepth)*goColor; % bright fix
+    noGoColor = max(env.colorDepth)*noGoColor; % bright fix
+    bgColor = max(env.colorDepth)*bgColor; % dark bg
 
     % set a home directory somewhere
     env.home = pwd;
     cd(env.home);
 
-    % image directory
+    % data directory
     if IsOSX
         env.splitChar = '/';
     else
         env.splitChar = '\';
     end
-    env.imageDirectory = strcat(env.home,env.splitChar,'stimuli');
-    env.imStr = '.png';
-
-    % get a list of image names
-    cd(env.imageDirectory)
-    files = dir;
-    idx = ~cellfun(@isempty,strfind({files.name},env.imStr));
-    idx = and(idx,cellfun(@isempty,strfind({files.name},'._')));
-    imageList = {files(idx).name};
-    imageIdx = [1:length(imageList)];
-
     env.dataDir = strcat(env.home,env.splitChar,'train',env.splitChar,'data');
     
     % setup keyboard
@@ -208,7 +215,7 @@ end
 
 function escStimCheck
     [keyIsDown, secs, keyCode] = KbCheck;
-    if keyCode(env.juicekey) && fixOnTrue
+    if keyCode(env.juicekey) && goOnTrue
         count = 1;
         while count < nJuices
 %             try,
