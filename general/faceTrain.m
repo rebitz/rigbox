@@ -73,26 +73,25 @@ while continueRun
             fixOnTrue = false;
         end
         
+        % clear the screen
+        Screen(w,'FillRect',bgColor)
+        screenClearT = Screen(w,'Flip');
+
+        %% close out the trial
+
+        WaitSecs(0.2);
+
+        % save the filedata
+        trials(tNum).juiceCount = juiceCount;
+        trials(tNum).nFlips = nFlips;
+        trials(tNum).imageName = imName;
+        trials(tNum).firstFixOnT = firstFixOnT;
+        trials(tNum).trialEnd = screenClearT;
+
+        % setup the next trial
+        tNum = tNum+1;
     end
     if ~continueRun; break; end
-    
-    % clear the screen
-    Screen(w,'FillRect',bgColor)
-    screenClearT = Screen(w,'Flip');
-    
-    %% close out the trial
-    
-    WaitSecs(0.2);
-    
-    % save the filedata
-    trials.juiceCount = juiceCount;
-    trials.nFlips = nFlips;
-    trials.imageName = imName;
-    trials.firstFixOnT = firstFixOnT;
-    trials.trialEnd = screenClearT;
-    
-    % setup the next trial
-    tNum = tNum+1;
  
 end
 
