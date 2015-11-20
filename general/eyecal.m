@@ -16,7 +16,7 @@ env.digOut = digOut;
 const.monkeyScreen = env.screenNumber;
 const.interTrial = 1; % In seconds
 stimOnTime = 60000; % very long is the point
-const.bgColor = [127 127 127];
+const.bgColor = [0 0 0];%[127 127 127];
 const.targColor = [255 255 255];
 
 Screen('CloseAll'); % Screen clear
