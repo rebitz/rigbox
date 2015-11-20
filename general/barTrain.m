@@ -4,23 +4,24 @@ function barTrain(monk)
 filename = strcat(monk,'_','barTrain','_',datestr(now,'ddmmyyyy_HHMM'));
 
 % make a default environment!!!
-global env juiceCount; defaultEnv;
+global env juiceCount ioObj; defaultEnv;
 KbName('UnifyKeyNames');
 
 % set defaults
 % stimuli/display?
-fullScreen = 1; % full screen color?
+fullScreen = 0; % full screen color?
     % else:
     fixSize = 10;
 cueGoTime = 1; % else, put up the cue after release
 goColor = [1 1 1]; % white
-noGoColor = [.5 .5 .5]; % gray
+noGoColor = [1 .5 .5]; % gray
 bgColor = [0 0 0];
 
 % timings?
 tToGo = 2;
-tToHold = 1;
+tToHoldSeeds = [.1 .3];
 tWaitInGo = 2;
+itiSeeds = [1 2];
 
 % others?
 nJuices = 5;
@@ -29,6 +30,7 @@ nJuices = 5;
 tNum = 1;
 continueRun = 1;
 fixGo = 0;
+buffer = NaN(1,10);
 
 % prepare the environment
 setupDIOLocal;
@@ -36,48 +38,58 @@ disp('dio open');
 prepareEnv; % open the screen, eyelink connectionk, etc
 disp('environment initialized');
 
+% define a utility for making jitter
+sampleFrom = @(x) rand*range(x)+min(x);
+
 while continueRun
 
     if ~continueRun; break; end
     
-    % initialize trial stuff
-    juiceCount = 0; goOnTrue = false; barDown = false; released = false;
-
-    disp('new trial!');
-    
     waiting = 1;
     while waiting % main body of the code
         
+        % initialize trial stuff
+        juiceCount = 0; goOnTrue = false; barDown = false; released = false;
+        responseT = NaN; initializeT = NaN;
+        iti = sampleFrom(itiSeeds); tToHold = sampleFrom(tToHoldSeeds);
+        
+        % put up the first cue
         Screen(w,'FillRect',bgColor)
         Screen(w,'FillRect',noGoColor,fixRect)
         flipT1 = Screen(w,'Flip');
         
+        % wait for bar to be down
         while (GetSecs() - flipT1) < tToGo && ~barDown
             escStimCheck;
-            barDown = bitand(env.leverBitMask, io32(ioObj, env.juicePort+1));
-            if barDown
-                initializeT = GetSecs();
-                goOnTrue = true; % allow manual juicing
-            end
+            barCheck;
         end
         
-        while (GetSecs() - flipT1) < tToHold && barDown
+        if barDown % if sucessful!
+            initializeT = GetSecs();
+            goOnTrue = true; % allow manual juicing
+        end
+
+        while (GetSecs() - initializeT) < tToHold && barDown
             escStimCheck;
-            barDown = bitand(env.leverBitMask, io32(ioObj, env.juicePort+1));
+            barCheck;
         end
         
         if cueGoTime && barDown % if we're telling him when to go
             Screen(w,'FillRect',bgColor)
             Screen(w,'FillRect',goColor,fixRect)
             flipT2 = Screen(w,'Flip');
+        else
+            flipT2 = GetSecs();
         end
         
-        while (GetSecs() - flipT2) < tWaitInGo && ~released && barDown
+        while barDown && (GetSecs() - flipT2) < tWaitInGo
             escStimCheck;
-            released = ~bitand(env.leverBitMask, io32(ioObj, env.juicePort+1));
-            if released
-                responseT = GetSecs();
-            end
+            barCheck;
+        end
+        
+        if ~barDown
+            responseT = GetSecs();
+            giveJuice();
         end
     
         % clear the screen
@@ -96,7 +108,13 @@ while continueRun
         trials(tNum).trialEnd = screenClearT;
 
         % setup the next trial
-        tNum = tNum+1;
+        tNum = tNum+1
+        
+        % ITI
+        itiStart = GetSecs;
+        while (GetSecs - itiStart) < iti
+            escStimCheck;
+        end
     end
     
     if ~continueRun; break; end
@@ -111,7 +129,7 @@ closeTask;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function setupDIOLocal
-    global ioObj
+    %global ioObj
 
     try,
         ioObj = io32;
@@ -235,6 +253,11 @@ function escStimCheck
     elseif keyCode(env.waitkey);
         waiting = 0;
     end
+end
+
+function barCheck
+    buffer = [buffer(2:end) ~bitand(env.leverBitMask, io32(ioObj, env.juicePort+1))];
+    barDown = nanmean(buffer) > .9;
 end
 
 function makeAudioFeedback
