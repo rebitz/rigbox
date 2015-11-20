@@ -27,7 +27,7 @@ function continueRun = escStimCheck(env)
         continueRun = 0;
     elseif keyCode(env.juicekey);
         giveJuice;
-        WaitSecs(0.1); % refractory
+        WaitSecs(0.01); % refractory
     end
 end
 

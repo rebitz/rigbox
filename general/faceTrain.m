@@ -13,8 +13,8 @@ global env juiceCount; defaultEnv;
 KbName('UnifyKeyNames');
 
 % set defaults
-fixSize = 6;
-useFaces = 1;
+fixSize = 10;
+useFaces = 0;
 nJuices = 10;
 fixErr = 2; % unused
 fixColor = repmat(max(env.colorDepth)*1,1,3); % bright fix
