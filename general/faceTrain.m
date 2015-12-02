@@ -44,7 +44,7 @@ while continueRun
 
     disp('ready for fixation, press "t" to display');
     waiting = 1; fixOnTrue = false;
-    while waiting % main body of the code
+    while waiting % main body of the trial code
         
         escStimCheck;
         
@@ -57,7 +57,7 @@ while continueRun
             end
             flipT = Screen(w,'Flip');
             while (GetSecs - flipT) < 0.15
-                escStimCheck;
+                %escStimCheck;
             end
             fixOnTrue = true;
             fixGo = 0;
@@ -72,25 +72,26 @@ while continueRun
             fixGo = 0;
             fixOnTrue = false;
         end
-        
-        % clear the screen
-        Screen(w,'FillRect',bgColor)
-        screenClearT = Screen(w,'Flip');
-
-        %% close out the trial
-
-        WaitSecs(0.2);
-
-        % save the filedata
-        trials(tNum).juiceCount = juiceCount;
-        trials(tNum).nFlips = nFlips;
-        trials(tNum).imageName = imName;
-        trials(tNum).firstFixOnT = firstFixOnT;
-        trials(tNum).trialEnd = screenClearT;
-
-        % setup the next trial
-        tNum = tNum+1;
     end
+    
+    % clear the screen
+    Screen(w,'FillRect',bgColor)
+    screenClearT = Screen(w,'Flip');
+
+    %% close out the trial
+
+    WaitSecs(0.2);
+
+    % save the filedata
+    trials(tNum).juiceCount = juiceCount;
+    trials(tNum).nFlips = nFlips;
+    trials(tNum).imageName = imName;
+    trials(tNum).firstFixOnT = firstFixOnT;
+    trials(tNum).trialEnd = screenClearT;
+
+    % setup the next trial
+    tNum = tNum+1;
+
     if ~continueRun; break; end
  
 end

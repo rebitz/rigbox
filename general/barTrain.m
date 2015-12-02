@@ -20,11 +20,11 @@ bgColor = [0 0 0];
 % timings?
 tToGo = 2;
 tToHoldSeeds = [.1 .3];
-tWaitInGo = 2;
+tWaitInGo = 5;
 itiSeeds = [1 2];
 
 % others?
-nJuices = 5;
+nJuices = 10;
 
 % initialize vars
 tNum = 1;
@@ -50,7 +50,7 @@ while continueRun
         
         % initialize trial stuff
         juiceCount = 0; goOnTrue = false; barDown = false; released = false;
-        responseT = NaN; initializeT = NaN;
+        responseT = NaN; initializeT = NaN; flipT2 = NaN;
         iti = sampleFrom(itiSeeds); tToHold = sampleFrom(tToHoldSeeds);
         
         % put up the first cue
@@ -78,18 +78,23 @@ while continueRun
             Screen(w,'FillRect',bgColor)
             Screen(w,'FillRect',goColor,fixRect)
             flipT2 = Screen(w,'Flip');
-        else
+        elseif barDown
             flipT2 = GetSecs();
         end
         
+        % wait for the period in which he can respond
         while barDown && (GetSecs() - flipT2) < tWaitInGo
             escStimCheck;
             barCheck;
         end
         
-        if ~barDown
+        if ~barDown && ~isnan(flipT2)
             responseT = GetSecs();
-            giveJuice();
+            count = 1;
+            while count < nJuices
+                giveJuice();
+                count = count+1;
+            end
         end
     
         % clear the screen
@@ -234,14 +239,14 @@ end
 function escStimCheck
     [keyIsDown, secs, keyCode] = KbCheck;
     if keyCode(env.juicekey) && goOnTrue
-        count = 1;
+        count = 1; nJuices
         while count < nJuices
 %             try,
                 giveJuice;
 %             catch
 %                 disp('tried to juice')
 %             end
-            count = count+1;
+            count = count+1
         end
         juiceCount = juiceCount+1;
     elseif keyCode(env.stimkey);
