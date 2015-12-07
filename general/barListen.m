@@ -4,21 +4,26 @@ function barListen(monk)
 filename = strcat(monk,'_','barTrain','_',datestr(now,'ddmmyyyy_HHMM'));
 
 % make a default environment!!!
-global env juiceCount; defaultEnv;
+global env juiceCount ioObj; defaultEnv;
 KbName('UnifyKeyNames');
 
 % set defaults
 % stimuli/display?
-fullScreen = 1; % full screen color?
+fullScreen = 0; % full screen color?
     % else:
     fixSize = 10;
 goColor = [1 1 1]; % white
-noGoColor = [.5 .5 .5]; % gray
+noGoColor = [.25 .25 .25]; % gray
 bgColor = [0 0 0];
 
 % others?
-nJuices = 5; % for manual
-maxDur = 2; % max seconds of hold down
+nJuices = 1; % for manual
+maxDur = 5; % max seconds of hold down
+juiceRelease = true;
+nReleaseJuice = 2;
+decayJuice = true;
+decayConstant = 3; % larger = slower decay
+iti = .5;
 
 % initialize vars
 tNum = 1;
@@ -33,34 +38,47 @@ disp('environment initialized');
 
 while continueRun
 
+    WaitSecs(iti);
+    
     if ~continueRun; break; end
     
     % initialize trial stuff
     juiceCount = 0; goOnTrue = true; barDown = false;
     responseT = NaN; releaseT = NaN;
 
-    disp('new trial!');
     trialStartT = GetSecs();
-    
+        
+    % put up the first cue
+    Screen(w,'FillRect',bgColor)
+    Screen(w,'FillRect',noGoColor,fixRect)
+    flipT1 = Screen(w,'Flip');
+        
     waiting = 1;
     while waiting % main body of the code
         
         escStimCheck;
-        if ~barDown && bitand(env.leverBitMask, io32(ioObj, env.juicePort+1))
+        if ~barDown && ~bitand(env.leverBitMask, io32(ioObj, env.juicePort+1))
             responseT = GetSecs();
             barDown = true;
-        elseif ~bitand(env.leverBitMask, io32(ioObj, env.juicePort+1))
+        elseif barDown && bitand(env.leverBitMask, io32(ioObj, env.juicePort+1))
             barDown = false;
             releaseT = GetSecs();
+            if juiceRelease; giveJuice(nReleaseJuice); end
             waiting = 0;
         end
         
         if barDown && (GetSecs-responseT) < maxDur
-            giveJuice;
+            if decayJuice; WaitSecs((GetSecs-responseT) / (maxDur*decayConstant)); end
+            giveJuice(1);
             juiceCount = juiceCount + 1;
         end
 
     end
+    
+    % clear the screen
+    Screen(w,'FillRect',bgColor)
+    screenClearT = Screen(w,'Flip');
+    goOnTrue = false;
             
     % setup the next trial, save this one
     tNum = tNum+1;
@@ -80,7 +98,7 @@ closeTask;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function setupDIOLocal
-    global ioObj
+    %global ioObj
 
     try,
         ioObj = io32;
@@ -185,16 +203,8 @@ end
 function escStimCheck
     [keyIsDown, secs, keyCode] = KbCheck;
     if keyCode(env.juicekey) && goOnTrue
-        count = 1;
-        while count < nJuices
-%             try,
-                giveJuice;
-%             catch
-%                 disp('tried to juice')
-%             end
-            count = count+1;
-        end
-        juiceCount = juiceCount+1;
+        giveJuice(nJuices)
+        juiceCount = juiceCount+nJuices;
     elseif keyCode(env.stimkey);
         % put up the stim cross
         fixGo = 1;
