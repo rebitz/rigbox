@@ -19,7 +19,7 @@ bgColor = [0 0 0];
 
 % timings?
 tToGo = 2;
-tToHoldSeeds = [.1 .3];
+tToHoldSeeds = [.15 .4];
 tWaitInGo = 5;
 itiSeeds = [1 2];
 
@@ -90,11 +90,7 @@ while continueRun
         
         if ~barDown && ~isnan(flipT2)
             responseT = GetSecs();
-            count = 1;
-            while count < nJuices
-                giveJuice();
-                count = count+1;
-            end
+            giveJuice(nJuices);
         end
     
         % clear the screen
