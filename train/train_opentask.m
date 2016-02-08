@@ -30,12 +30,12 @@ if ~isdir(filename)
     mkdir(filename)
 else
     i = 1;
-    if i > 10
-        zpad = '_0';
-    end
     filename = strcat(filestart,zpad,num2str(i));
     while isdir(filename)
         i = i+1;
+        if i > 10
+            zpad = '_0';
+        end
         filename = strcat(filestart,zpad,num2str(i));
     end
     mkdir(filename);
@@ -68,6 +68,16 @@ targ_err = deg2px(targ_err, env)./2;
 errorSize = deg2px(errorSize, env)./2;
 errorRect = [origin origin] + [-errorSize -errorSize errorSize errorSize];
 
+% make a gabor in case we need it
+
+% get the size of the gabor window
+vhSize = deg2px(gSize, env);
+vhSize = ceil([vhSize vhSize]);
+
+% now generate the texture
+gb = gabor(vhSize, gCycles, gOrientation, gPhase, gSigma, gMean, gAmp);
+gb = gb .*env.colorDepth;
+gbIndx = Screen('MakeTexture', w, gb);
 
 %% Make Eyelink start recording
 

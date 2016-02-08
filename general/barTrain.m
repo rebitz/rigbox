@@ -1,35 +1,41 @@
-function barTrain(monk)
+function trials = barTrain(monk)
 %
 % first parse inputs
 filename = strcat(monk,'_','barTrain','_',datestr(now,'ddmmyyyy_HHMM'));
 
 % make a default environment!!!
-global env juiceCount ioObj; defaultEnv;
+global env juiceCount ioObj allRects; defaultEnv;
 KbName('UnifyKeyNames');
 
 % set defaults
 % stimuli/display?
 fullScreen = 0; % full screen color?
     % else:
-    fixSize = 10;
+    fixSize = 4;
+    fixShift = 8;
 cueGoTime = 1; % else, put up the cue after release
 goColor = [1 1 1]; % white
 noGoColor = [1 .5 .5]; % gray
 bgColor = [0 0 0];
+maxTR = 25;
 
 % timings?
 tToGo = 2;
-tToHoldSeeds = [.15 .4];
-tWaitInGo = 5;
-itiSeeds = [1 2];
+tToHoldSeeds = [.6 1.2];
+tWaitInGo = 2.15;
+itiSeeds = [1.15 2.25];
+penaltyWait = .05;
 
 % others?
-nJuices = 10;
+nJuices = 5;
+pJackpot = 0.15;
+jackpotTimes = 3;
 
 % initialize vars
 tNum = 1;
 continueRun = 1;
 fixGo = 0;
+whichFix = 1;
 buffer = NaN(1,10);
 
 % prepare the environment
@@ -52,6 +58,9 @@ while continueRun
         juiceCount = 0; goOnTrue = false; barDown = false; released = false;
         responseT = NaN; initializeT = NaN; flipT2 = NaN;
         iti = sampleFrom(itiSeeds); tToHold = sampleFrom(tToHoldSeeds);
+        if exist('nextRect');
+            fixRect = nextRect; % only update location at tr start
+        end
         
         % put up the first cue
         Screen(w,'FillRect',bgColor)
@@ -90,7 +99,10 @@ while continueRun
         
         if ~barDown && ~isnan(flipT2)
             responseT = GetSecs();
-            giveJuice(nJuices);
+            if rand(1) < pJackpot; timesBy = jackpotTimes;
+            else timesBy = 1; end
+            giveJuice(nJuices*timesBy);
+            released = true;
         end
     
         % clear the screen
@@ -113,9 +125,12 @@ while continueRun
         
         % ITI
         itiStart = GetSecs;
+        if ~released; iti = iti+penaltyWait; end
         while (GetSecs - itiStart) < iti
             escStimCheck;
         end
+        
+        if tNum>maxTR; waiting = 0; continueRun = 0; end
     end
     
     if ~continueRun; break; end
@@ -189,6 +204,14 @@ function prepareEnv
     noGoColor = max(env.colorDepth)*noGoColor; % bright fix
     bgColor = max(env.colorDepth)*bgColor; % dark bg
 
+    fixShift = deg2px(fixShift, env);
+    
+    allRects = [fixRect;...
+        fixRect + [fixShift 0 fixShift 0];...
+        fixRect - [fixShift 0 fixShift 0];...
+        fixRect + [0 fixShift 0 fixShift];...
+        fixRect - [0 fixShift 0 fixShift]];
+
     % set a home directory somewhere
     env.home = pwd;
     cd(env.home);
@@ -216,6 +239,10 @@ function prepareEnv
     
     if ~exist('juicekey')
         env.juicekey = KbName('space');
+    end
+    
+    if ~exist('nextkey')
+        env.nextkey = KbName('RightArrow');
     end
     
     % now fill out and save our taskdata stuff, now we've got it all
@@ -253,6 +280,14 @@ function escStimCheck
         continueRun = 0;
     elseif keyCode(env.waitkey);
         waiting = 0;
+    elseif keyCode(env.nextkey);
+        if whichFix < size(allRects,1)
+            nextRect = allRects(whichFix+1,:);
+            whichFix = whichFix+1;
+        else
+            nextRect = allRects(1,:);
+            whichFix = 1;
+        end
     end
 end
 

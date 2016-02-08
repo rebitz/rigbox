@@ -25,6 +25,7 @@ try
     
     % Fixation onset block
     if ~error_made && fixationMode
+        Screen(w,'FillRect',bgcolor)
         Screen(w,'FillRect',fixcolor,fixRect);
         fixon = Screen(w,'Flip');
 
@@ -63,7 +64,14 @@ try
                 
         % Cue onset (keep fix point there)
         Screen(w,'FillRect',fixcolor,fixRect);
-        Screen(w,'FillRect',targcolor,targRect);
+        if gaborTarg
+            Screen('DrawTexture',w,gbIndx,[],targRect,rotTexture);
+        else
+            Screen(w,'FillRect',targcolor,targRect);
+        end
+        if gaborTarg && choiceTrial
+            Screen('DrawTexture',w,gbIndx,[],altTargRect,0);
+        end
         targon = Screen(w,'Flip');
         
         sampleEye;
@@ -105,7 +113,14 @@ try
         
         % then GO CUE
         if targOnAfterGo || (~memoryMode && ~overlapMode)
-            Screen(w,'FillRect',targcolor,targRect);
+            if gaborTarg
+                Screen('DrawTexture',w,gbIndx,[],targRect,rotTexture);
+            else
+                Screen(w,'FillRect',targcolor,targRect);
+            end
+        end
+        if gaborTarg && choiceTrial
+            Screen('DrawTexture',w,gbIndx,[],altTargRect,0);
         end
         Screen(w,'FillRect',bgcolor,fixRect)
         goCue = Screen(w,'Flip');
@@ -115,7 +130,17 @@ try
         while ((GetSecs - goCue) < time2choose) && ~acquired
             if checkFix(targOrigin, targ_err, space);
                 targAcq = GetSecs();
+                if choiceTrial % if it's a choice, reward for picking the best
+                    jackpotTrial = 1;
+                end
                 acquired = 1;
+                tAcquired = 'high';
+            elseif choiceTrial && checkFix(altTargOrigin, targ_err, space)
+                targAcq = GetSecs;
+                targOrigin = altTargOrigin; % set selected for holding
+                jackpotTrial = 0;
+                acquired = 1;
+                tAcquired = 'low';
             else
                 sampleEye;
                 esc_check;
@@ -140,6 +165,17 @@ try
     
     if ~error_made && targetMode % Hold fixation of chosen targ
         
+        % remove everything but the chosen targ from the screen
+        if choiceTrial
+            Screen(w,'FillRect',bgcolor)
+            if jackpotTrial
+                Screen('DrawTexture',w,gbIndx,[],targRect,rotTexture);
+            elseif  ~jackpotTrial
+                Screen('DrawTexture',w,gbIndx,[],altTargRect,0);
+            end
+            Screen(w,'Flip');
+        end
+        
         % Hold fixation of target
         held = 1;
         while ((GetSecs - targAcq) < targHoldTime) && held
@@ -158,9 +194,11 @@ try
         
     end
     
-    % Remove everything from the screen
-    Screen(w,'FillRect',bgcolor)
-    Screen(w,'Flip');
+    if rmTargB4Rwd
+        % Remove everything from the screen
+        Screen(w,'FillRect',bgcolor)
+        Screen(w,'Flip');
+    end
         
     %% OUTCOMES!
     
@@ -209,16 +247,20 @@ try
     else % No errors, correct trial
         
         juiceTime = markEvent('juice');
-        giveJuice;
+        giveJuice(nDropsJuice);
         correct = 1;
         
-        if rand < pJackpot
-            for drop = 1:nJackpotDrops
-                giveJuice;
+        if jackpotTrial
+            for drop = 1:jackpotMultiple
+                giveJuice(nDropsJuice);
             end
         end
         
     end
+    
+    % Remove everything from the screen
+    Screen(w,'FillRect',bgcolor)
+    Screen(w,'Flip');
     
     trialstop = markEvent('trialStop');
     

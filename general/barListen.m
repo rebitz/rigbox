@@ -1,7 +1,7 @@
 function barListen(monk)
 %
 % first parse inputs
-filename = strcat(monk,'_','barTrain','_',datestr(now,'ddmmyyyy_HHMM'));
+filename = strcat(monk,'_','barListen','_',datestr(now,'ddmmyyyy_HHMM'));
 
 % make a default environment!!!
 global env juiceCount ioObj; defaultEnv;
@@ -11,24 +11,30 @@ KbName('UnifyKeyNames');
 % stimuli/display?
 fullScreen = 0; % full screen color?
     % else:
-    fixSize = 10;
+    fixSize = 7;
 goColor = [1 1 1]; % white
-noGoColor = [.25 .25 .25]; % gray
+noGoColor = [1 .5 .5]; % gray
 bgColor = [0 0 0];
 
 % others?
+maxTR = 1000;
 nJuices = 1; % for manual
-maxDur = 5; % max seconds of hold down
+maxDur = 6; % max seconds of hold down
 juiceRelease = true;
-nReleaseJuice = 2;
+nReleaseJuice = 1;
 decayJuice = true;
-decayConstant = 3; % larger = slower decay
-iti = .5;
+decayConstant = 20; % larger = slower decay
+delayToFirstJuice = 0.05; % make this not synonymous w/ cue onset
+flipAtFirstJuice = true;
+juiceBeforeRelease = true;
+iti = .1;
+flipOnRelease = true;
 
 % initialize vars
 tNum = 1;
 continueRun = 1;
 fixGo = 0;
+buffer = NaN(1,10); % for smoothing bar checking
 
 % prepare the environment
 setupDIOLocal;
@@ -57,20 +63,41 @@ while continueRun
     while waiting % main body of the code
         
         escStimCheck;
-        if ~barDown && ~bitand(env.leverBitMask, io32(ioObj, env.juicePort+1))
+        if ~barDown && barCheck
             responseT = GetSecs();
             barDown = true;
-        elseif barDown && bitand(env.leverBitMask, io32(ioObj, env.juicePort+1))
+        elseif barDown && ~barCheck
             barDown = false;
             releaseT = GetSecs();
+            if flipOnRelease;
+                % put up the visual evidence
+                Screen(w,'FillRect',bgColor)
+                Screen(w,'FillRect',goColor,fixRect)
+                flipT2 = Screen(w,'Flip');
+            end
             if juiceRelease; giveJuice(nReleaseJuice); end
             waiting = 0;
         end
         
         if barDown && (GetSecs-responseT) < maxDur
-            if decayJuice; WaitSecs((GetSecs-responseT) / (maxDur*decayConstant)); end
-            giveJuice(1);
-            juiceCount = juiceCount + 1;
+            rwd = 1; start = GetSecs;
+            if decayJuice && juiceBeforeRelease
+                while GetSecs - start < (((GetSecs-responseT) / (maxDur*decayConstant)) + delayToFirstJuice)
+                    if ~barCheck
+                        rwd = 0;
+                        break;
+                    end
+                end
+            end
+            if rwd;
+                if flipAtFirstJuice;
+                    Screen(w,'FillRect',bgColor)
+                    Screen(w,'FillRect',goColor,fixRect)
+                    flipT2 = Screen(w,'Flip');
+                end
+                giveJuice(1);
+                juiceCount = juiceCount + 1;
+            end
         end
 
     end
@@ -81,11 +108,12 @@ while continueRun
     goOnTrue = false;
             
     % setup the next trial, save this one
-    tNum = tNum+1;
+    tNum = tNum+1
     trials(tNum).responseT = responseT;
     trials(tNum).releaseT = releaseT;
     trials(tNum).trialStartT = trialStartT;
     
+    if tNum>maxTR; continueRun =0; end
     if ~continueRun; break; end
 end
 
@@ -198,6 +226,11 @@ function prepareEnv
     cd(env.dataDir);
     save(strcat(filename,'_taskdata'),'taskdata');
     cd(env.home);
+end
+
+function check = barCheck
+    buffer = [buffer(2:end) ~bitand(env.leverBitMask, io32(ioObj, env.juicePort+1))];
+    check = nanmean(buffer) > .9;
 end
 
 function escStimCheck

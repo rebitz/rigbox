@@ -13,6 +13,7 @@ end
 
 if keyCode(stopkey)
     keep_waiting = 0;
+    fixChecking = 0;
     continue_running = 0;
     error_made = 1; errortype = NaN;
 elseif keyCode(juicekey)

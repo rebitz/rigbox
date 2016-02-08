@@ -14,10 +14,15 @@ env.rigID = 'OuterSpace'; %
 % juicer stuff
 env.juicePort = hex2dec('DFF8');
 env.rwdBit = 1;
-env.rwdDuration = 60; % in ms
-env.rwdDelay = 100; % in ms
+env.rwdDuration = 45; % in ms
+env.rwdDelay = 55; % in ms
 env.defaultRwdDrops = 1;
 
+if exist('monk')==1 && strcmp(monk,'beak')
+    env.rwdDuration = 200; % in ms
+    env.rwdDelay = 5; % in ms
+end
+
 % eyelink stuff
-env.eyeToTrack = 'LEFT'; % if not binocular
-env.binocularEye = 'YES'; % 'NO' to pick a particular eye
+env.eyeToTrack = 'RIGHT'; % if not binocular
+env.binocularEye = 'NO'; % 'NO' to pick a particular eye

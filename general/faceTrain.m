@@ -8,9 +8,9 @@ global env juiceCount allRects; defaultEnv;
 KbName('UnifyKeyNames');
 
 % set defaults
-fixSize = 5;
+fixSize = 10;
 useFaces = 1; % at all?
-pNotFace = 0.1;
+pNotFace = .75;
 nJuices = 3;
 fixShift = 5;
 fixColor = repmat(max(env.colorDepth)*1,1,3); % bright fix

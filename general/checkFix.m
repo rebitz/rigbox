@@ -6,7 +6,7 @@ function fixed = checkFix(object, err, key)
 
 fixChecking = 1;
 
-global TESTING EYEBALL
+global TESTING EYEBALL env
 
 fixed = 0;
 
@@ -31,13 +31,16 @@ if ~TESTING && EYEBALL
         
     checked = 0;
        
-    while ~checked
+    while ~checked && fixChecking
         
         if Eyelink('newfloatsampleavailable')>0;
                         
             evt = Eyelink( 'newestfloatsample');
-            x = evt.gx(1);
-            y = evt.gy(1);
+            if strcmp(env.eyeToTrack,'RIGHT')
+                x = evt.gx(2); y = evt.gy(2);
+            elseif strcmp(env.eyeToTrack,'LEFT')
+                x = evt.gx(1); y = evt.gy(1);
+            end
             
             if (evt.pa(1) > 0) && (abs(x-object(1)) > err || abs(y-object(2)) > err)
                 fixed = 0;
