@@ -4,11 +4,13 @@
 fixationMode = 1;
 targetMode = 1; % targ on at all?
     % this guy supercedes all that come below it
-overlapMode = 0; % targ on before fix off?
+overlapMode = 1; % targ on before fix off?
 targOnAfterGo = 1; % have the target on after fix off go cue?
     % combining these two is a simple overlap task
 memoryMode = 0; % turn targ off at any point before fix off?
     % if this is set to 1, then there is an overlap by default
+rmTargB4Rwd = 0; % 1 = targ off b4 rwd, else, targ on until after rwd
+
 gaborTarg = 1;
     % fixed gabor stuff
     % gabor(vhSize, cyclesPer100Pix, orientation, phase, sigma , mean, amplitude);
@@ -18,7 +20,7 @@ gaborTarg = 1;
     gSigma = 15; % of window
     gMean = 0.5; % 0.5 % brightness -> currently half of background
     gAmp = 0.5; % CONTRAST!
-    gOrientation = 10;
+    gOrientation = 150;
     
 rotateForJackpot = 1;
     rotateBy = 90;
@@ -26,29 +28,29 @@ rotateForJackpot = 1;
 pChoice = 0.7;
     
 % walk up the baground color to neutral gray
-bgcolor = repmat(123,1,3);
+bgcolor = repmat(127,1,3);
 
-nDropsJuice = 6;
-pJackpot = 0.2;
+nDropsJuice = 3;
+pJackpot = 0.3;
 jackpotMultiple = 3;
 
 % Number of trials
-ntrials = 17;
+ntrials = 30;
 
 % Timing windows:
-targHoldTime = 0.18; % time to hold target fix
+targHoldTime = 0.15; % time to hold target fix
 
 fixHoldMin = 0.4; % time to hold fixation
 fixHoldMax = 0.75;
 
-targOverlapMin = 0.3; % targ on before fix off t
-targOverlapMax = 0.4;
+targOverlapMin = 0.05; % targ on before fix off t
+targOverlapMax = 0.11;
 
 targGapMin = 0.5; % targ off before go cue t
 targGapMax = 0.8;
 
 % Fixation size
-fixSize = 1.1; % in dg (radius)
+fixSize = 1; % in dg (radius)
 
 % Target size
 targSize = 3;
@@ -56,7 +58,7 @@ if gaborTarg; targSize = 5; end
 
 % Allowable error
 fix_err = 10; % in dg
-targ_err = 9; % in dg
+targ_err = 12; % in dg
 
 % target locations
 nLoc = 8; % number of positions around the circle

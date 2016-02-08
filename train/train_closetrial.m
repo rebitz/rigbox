@@ -21,6 +21,11 @@ trials.targOn = targon;
 trials.targOff = targoff;
 trials.goCue = goCue;
 trials.targAcq = targAcq;
+if exist('tAcquired') ==1
+    trials.whichTarg = tAcquired;
+else
+    trials.whichTarg = NaN;
+end
 trials.targOverlap = targOverlap;
 trials.targGap = targGap;
 
@@ -29,7 +34,11 @@ trials.radius = targR;
 trials.targRect = targRect;
 
 trials.correct = correct;
+trials.jackpot = jackpotTrial;
+trials.choiceTrial = choiceTrial;
 trials.juiceTime = juiceTime;
+
+% best choice in choice trials is jackpot == 1
 
 trials.error = error_made;
 trials.errortype = errortype;
@@ -65,5 +74,5 @@ cd(backhome)
 save(strcat(filename, zpad, num2str(trialnum)), 'trials');
 
 % Cleanup screen
-Screen(w,'FillRect', env.colorDepth/2);
+Screen(w,'FillRect', bgcolor);
 Screen(w,'Flip');

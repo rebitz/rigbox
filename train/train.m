@@ -21,12 +21,12 @@ try
                 
         train_opentrial; % Initialize a new trial
         train_runtrial;  % Run the trial
-        train_closetrial;    % Close the trial
+        train_closetrial; % Close the trial
         
     end
     
     closeTask; % general rig specific function
-    ListenChar(0);               
+    ListenChar(0);
     
 catch
     

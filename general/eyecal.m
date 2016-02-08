@@ -1,5 +1,7 @@
 function eyecal(nCalPts)
 
+targSizeMultiple = 8;%2.5;
+
 % Default to 5-point calibration:
 if nargin<1
     nCalPts = 5;
@@ -11,6 +13,8 @@ global env const
 env.allDIOclosed = flags;
 env.nports = nports;
 env.digOut = digOut;
+
+env.nDrops = 5;
 
 % Define some basic constants:
 const.monkeyScreen = env.screenNumber;
@@ -107,7 +111,7 @@ fixShape  = [-6 -8; ...
 fixShape2 = [-5 -7; ...
              5  7];
 targShape = [-8 -8; ...
-             8  8].*5;
+             8  8].*targSizeMultiple;
 fixRect = shiftPoints(fixShape, const.screenCenter)';
 fixRect = fixRect(:)'
 fixRect2 = shiftPoints(fixShape2, const.screenCenter)';
@@ -210,12 +214,13 @@ function escapeHandler
 sharedWorkspace('EYECAL','keepGoing',false);
 
 function acceptFixation
+global env
 % accept trigger code
 Eyelink('AcceptTrigger');
 % Beep:
 % sound(sin(1:.4:400));
 count = 1;
-while count < 10
+while count < env.nDrops
     giveJuice;
     count = count+1;
 end

@@ -95,14 +95,14 @@ if EYEBALL
             Eyelink('Command', strcat('binocular_enabled = ', env.binocularEye));
             Eyelink('Command', 'screen_pixel_coords = %d %d %d %d', ...
                 rect(1), rect(2), rect(3), rect(4) );
-            Eyelink('Command', 'link_sample_data = LEFT,RIGHT,GAZE,AREA,PUPIL');
+            Eyelink('Command', 'link_sample_data = RIGHT,GAZE,AREA,PUPIL');
             edfname = 'ef.edf';
             Eyelink('openfile',edfname);
 
             % Calibrate tracker
             Eyelink('StartSetup');
-            Eyelink('DriftCorrStart', origin(1), origin(2));
-            Eyelink('ApplyDriftCorr');
+            %Eyelink('DriftCorrStart', origin(1), origin(2));
+            %Eyelink('ApplyDriftCorr');
 
             % Start of the task
             taskstart = GetSecs;
@@ -137,6 +137,9 @@ trialnum = 0;
 
 % Flag to keep running task
 continue_running = 1;
+
+% Flag for eye checking
+keep_waiting = true;
 
 % set a default wait time if waiting for text needs to happen
 waitForText = 1.5;
