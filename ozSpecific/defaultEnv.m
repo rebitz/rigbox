@@ -14,8 +14,8 @@ env.rigID = 'Oz'; %
 % juicer stuff
 env.juicePort = hex2dec('DFF8');
 env.rwdBit = 1;
-env.rwdDuration = 100; % in ms
-env.rwdDelay = 50; % in ms
+env.rwdDuration = 70; % in ms
+env.rwdDelay = 60; % in ms
 env.defaultRwdDrops = 1;
 
 % eyelink stuff

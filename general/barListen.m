@@ -22,8 +22,8 @@ maxDur = 5; % max seconds of hold down
 juiceRelease = true;
 nReleaseJuice = 2;
 decayJuice = true;
-decayConstant = 3; % larger = slower decay
-iti = .5;
+decayConstant = 10; % larger = slower decay
+iti = .2;
 
 % initialize vars
 tNum = 1;
