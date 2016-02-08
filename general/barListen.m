@@ -23,17 +23,13 @@ maxDur = 6; % max seconds of hold down
 juiceRelease = true;
 nReleaseJuice = 1;
 decayJuice = true;
-<<<<<<< HEAD
-decayConstant = 10; % larger = slower decay
-iti = .2;
-=======
+
 decayConstant = 20; % larger = slower decay
 delayToFirstJuice = 0.05; % make this not synonymous w/ cue onset
 flipAtFirstJuice = true;
 juiceBeforeRelease = true;
 iti = .1;
 flipOnRelease = true;
->>>>>>> 3f3151ae281a885a578b2aec24960106a9563017
 
 % initialize vars
 tNum = 1;

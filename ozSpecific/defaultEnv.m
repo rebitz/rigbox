@@ -14,7 +14,7 @@ env.rigID = 'Oz'; %
 % juicer stuff
 env.juicePort = hex2dec('DFF8');
 env.rwdBit = 1;
-env.rwdDuration = 70; % in ms
+env.rwdDuration = 200; % in ms
 env.rwdDelay = 60; % in ms
 env.defaultRwdDrops = 1;
 
