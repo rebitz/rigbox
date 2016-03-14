@@ -13,6 +13,7 @@ goCue = NaN;
 targAcq = NaN;  % target acquisition
 trialstart = NaN;   % start of the trial
 juiceTime = NaN;
+tAcquired = NaN;
 
 alltimes = [];
 
@@ -37,7 +38,24 @@ targR = tOffsets(tmp(1));
 
 [t1x, t1y] = pol2cart(deg2rad(targTh),deg2px(targR, env));
 targOrigin = [t1x,t1y]+origin;
-targRect = [targOrigin-targSize/2 targOrigin+targSize/2];
+targRect = [targOrigin-targSize targOrigin+targSize];
+
+% jackpot trial?
+jackpotTrial = rand < pJackpot;
+if jackpotTrial && rotateForJackpot
+    rotTexture = 90;
+else
+    rotTexture = 0;
+end
+
+% choice trial? (superceeds last)
+choiceTrial = rand < pChoice;
+if choiceTrial
+    [t1x, t1y] = pol2cart(deg2rad(targTh+180),deg2px(targR, env));
+    altTargOrigin = [t1x,t1y]+origin;
+    altTargRect = [altTargOrigin-targSize altTargOrigin+targSize];
+    rotTexture = 90; % rotate the main target
+end
 
 % Increment trialnum
 trialnum = trialnum + 1;

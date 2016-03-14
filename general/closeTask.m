@@ -5,10 +5,10 @@ if EYEBALL
     
     Eyelink('command', 'clear_screen %d', 0);
     Eyelink('stoprecording');
-    Eyelink('closefile');
-    Eyelink('receivefile',edfname,edfname);
+    %Eyelink('closefile');
+    %Eyelink('receivefile',edfname,edfname);
     Eyelink('shutdown');
-    cmd = sprintf('edf2asc %s',edfname);
+    %cmd = sprintf('edf2asc %s',edfname);
     %system(cmd);
 
 end

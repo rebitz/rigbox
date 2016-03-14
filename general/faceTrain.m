@@ -4,14 +4,15 @@ function faceTrain(monk)
 filename = strcat(monk,'_',datestr(now,'ddmmyyyy_HHMM'));
 
 % make a default environment!!!
-global env juiceCount; defaultEnv;
+global env juiceCount allRects; defaultEnv;
 KbName('UnifyKeyNames');
 
 % set defaults
-fixSize = 6;
+fixSize = 10;
 useFaces = 1; % at all?
-pNotFace = 0.1;
-nJuices = 5;
+pNotFace = .75;
+nJuices = 3;
+fixShift = 5;
 fixColor = repmat(max(env.colorDepth)*1,1,3); % bright fix
 bgColor = [0,0,0];%repmat(max(env.colorDepth)/3,1,3); % dark bg
 
@@ -19,6 +20,7 @@ bgColor = [0,0,0];%repmat(max(env.colorDepth)/3,1,3); % dark bg
 tNum = 1;
 continueRun = 1;
 fixGo = 0;
+whichFix = 1;
 
 % prepare the environment
 setupDIOLocal;
@@ -152,6 +154,13 @@ function prepareEnv
     % Setup stimuli and fixation rects
     fixSize = deg2px(fixSize, env)./2;
     fixRect = [origin origin] + [-fixSize -fixSize fixSize fixSize];
+    fixShift = deg2px(fixShift, env);
+    
+    allRects = [fixRect;...
+        fixRect + [fixShift 0 fixShift 0];...
+        fixRect - [fixShift 0 fixShift 0];...
+        fixRect + [0 fixShift 0 fixShift];...
+        fixRect - [0 fixShift 0 fixShift]];
 
     % set a home directory somewhere
     env.home = pwd;
@@ -193,6 +202,10 @@ function prepareEnv
         env.juicekey = KbName('space');
     end
     
+    if ~exist('nextkey')
+        env.nextkey = KbName('RightArrow');
+    end
+    
     % now fill out and save our taskdata stuff, now we've got it all
     taskdata = env;
     vars = who; 
@@ -228,6 +241,14 @@ function escStimCheck
         continueRun = 0;
     elseif keyCode(env.waitkey);
         waiting = 0;
+    elseif keyCode(env.nextkey);
+        if whichFix < size(allRects,1)
+            fixRect = allRects(whichFix+1,:);
+            whichFix = whichFix+1;
+        else
+            fixRect = allRects(1,:);
+            whichFix = 1;
+        end
     end
 end
 
