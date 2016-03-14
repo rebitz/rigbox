@@ -26,7 +26,7 @@ trials.whichCued = whichCued;
 trials.targGap = targGap; % time after cue
 trials.targOn = targon;
 trials.targOff = targoff;
-trials.targAcq = targAcq;
+trials.targAcq = targacq;
 
 % target information
 trials.theta = theseThetas;
@@ -41,6 +41,7 @@ trials.targSlots = targSlots;
 trials.targRadDistance = angDist; % in radians
 trials.targRwds = theseRwds;
 trials.switchTrial = switchTrial;
+trials.rwdSeed = rwdSeed;
 
 % performance information
 trials.correct = correct; % chose a target?
