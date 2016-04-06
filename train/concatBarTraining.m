@@ -1,5 +1,5 @@
-strToCat = '06012016'
-monk = 'bun';
+strToCat = '01042016'
+monk = 'beak';
 task = 'barTrain';
 
 cd(strcat(gitDir,splitChar,'train',splitChar,'data'));
@@ -9,6 +9,8 @@ idx = and(~cellfun(@isempty,strfind({files.name},strToCat)),...
 idx = and(idx,and(~cellfun(@isempty,strfind({files.name},monk)),...
     ~cellfun(@isempty,strfind({files.name},task))));
 files = {files(idx).name};
+
+
 
 data = [];
 for i = 1:length(files);
@@ -45,6 +47,7 @@ nanstd([data.rt])
 xpos = [0:.1:3];
 figure();
 bar(xpos,hist([data.rt],xpos))
+title('from go cue')
 
 % now align to another event - the time the bar goes down
 tmp = num2cell([data.responseT] - [data.t2initialize]);
@@ -56,5 +59,6 @@ nanstd([data.rt])
 xpos = [0:.1:3];
 figure();
 bar(xpos,hist([data.rt],xpos))
+title('from bar down')
 
 cd(gitDir);

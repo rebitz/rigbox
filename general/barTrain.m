@@ -13,22 +13,23 @@ fullScreen = 0; % full screen color?
     % else:
     fixSize = 4;
     fixShift = 8;
-cueGoTime = 1; % else, put up the cue after release
-goColor = [1 1 1]; % white
+onAtBar = 1;
+cueGoTime = 1; % use the cue to signal go time? else, put up the cue after release
+goColor = [1 .85 .95]; % white
 noGoColor = [1 .5 .5]; % gray
 bgColor = [0 0 0];
-maxTR = 25;
+maxTR = 100;
 
 % timings?
-tToGo = 2;
-tToHoldSeeds = [.6 1.2];
-tWaitInGo = 2.15;
-itiSeeds = [1.15 2.25];
+tToGo = 60; % time to wait for first lever press
+tToHoldSeeds = [.48 .85];%[.4 .92]; % min max hold time before go
+tWaitInGo = 2; % time to wait for for lever release, s
+itiSeeds = [.35 .75];
 penaltyWait = .05;
 
 % others?
-nJuices = 5;
-pJackpot = 0.15;
+nJuices = 4;
+pJackpot = 0.10;
 jackpotTimes = 3;
 
 % initialize vars
@@ -62,10 +63,14 @@ while continueRun
             fixRect = nextRect; % only update location at tr start
         end
         
-        % put up the first cue
-        Screen(w,'FillRect',bgColor)
-        Screen(w,'FillRect',noGoColor,fixRect)
-        flipT1 = Screen(w,'Flip');
+        if ~onAtBar
+            % put up the first cue
+            Screen(w,'FillRect',bgColor)
+            Screen(w,'FillRect',noGoColor,fixRect)
+            flipT1 = Screen(w,'Flip');
+        else
+            flipT1 = GetSecs();
+        end
         
         % wait for bar to be down
         while (GetSecs() - flipT1) < tToGo && ~barDown
@@ -76,6 +81,11 @@ while continueRun
         if barDown % if sucessful!
             initializeT = GetSecs();
             goOnTrue = true; % allow manual juicing
+            if onAtBar
+                Screen(w,'FillRect',bgColor)
+                Screen(w,'FillRect',noGoColor,fixRect)
+                flipT1 = Screen(w,'Flip');
+            end
         end
 
         while (GetSecs() - initializeT) < tToHold && barDown
@@ -261,17 +271,17 @@ end
 
 function escStimCheck
     [keyIsDown, secs, keyCode] = KbCheck;
-    if keyCode(env.juicekey) && goOnTrue
+    if keyCode(env.juicekey) %&& goOnTrue
         count = 1; nJuices
-        while count < nJuices
+        %while count < nJuices
 %             try,
                 giveJuice;
 %             catch
 %                 disp('tried to juice')
 %             end
-            count = count+1
-        end
-        juiceCount = juiceCount+1;
+         %   count = count+1
+        %end
+        %juiceCount = juiceCount+1;
     elseif keyCode(env.stimkey);
         % put up the stim cross
         fixGo = 1;
