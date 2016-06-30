@@ -33,7 +33,7 @@ else
     filename = strcat(filestart,zpad,num2str(i));
     while isdir(filename)
         i = i+1;
-        if i > 10
+        if i >= 10
             zpad = '_0';
         end
         filename = strcat(filestart,zpad,num2str(i));
@@ -58,6 +58,13 @@ fixSize = deg2px(fixSize, env)./2;
 fixRect = [origin origin] + [-fixSize -fixSize fixSize fixSize];
 fix_err = deg2px(fix_err, env)./2;
 
+ogSize = shrinkFixSize;
+shrinkFixSize = deg2px(shrinkFixSize, env)./2;
+shrinkFixRect = [origin origin] + [-shrinkFixSize -shrinkFixSize shrinkFixSize shrinkFixSize];
+
+shrinkFixSize = deg2px(ogSize-.5, env)./2;
+shrinkFixRect2 = [origin origin] + [-shrinkFixSize -shrinkFixSize shrinkFixSize shrinkFixSize];
+
 targSize = deg2px(targSize, env)./2;
 targ_err = deg2px(targ_err, env)./2;
 
@@ -78,6 +85,10 @@ vhSize = ceil([vhSize vhSize]);
 gb = gabor(vhSize, gCycles, gOrientation, gPhase, gSigma, gMean, gAmp);
 gb = gb .*env.colorDepth;
 gbIndx = Screen('MakeTexture', w, gb);
+
+pregb = gabor(vhSize, gCycles, gOrientation, gPhase, gSigma, gMean, gPreAmp);
+pregb = pregb .*env.colorDepth;
+preGbIndx = Screen('MakeTexture', w, pregb);
 
 %% Make Eyelink start recording
 

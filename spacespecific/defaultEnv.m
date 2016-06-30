@@ -14,7 +14,7 @@ env.rigID = 'OuterSpace'; %
 % juicer stuff
 env.juicePort = hex2dec('DFF8');
 env.rwdBit = 1;
-env.rwdDuration = 45; % in ms
+env.rwdDuration = 30; % in ms
 env.rwdDelay = 55; % in ms
 env.defaultRwdDrops = 1;
 
@@ -26,3 +26,6 @@ end
 % eyelink stuff
 env.eyeToTrack = 'RIGHT'; % if not binocular
 env.binocularEye = 'NO'; % 'NO' to pick a particular eye
+
+env.timeForSaccade = .02;
+env.threshForSaccade = 30;

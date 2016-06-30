@@ -41,6 +41,11 @@ try
         % If fixation acquired, record time of acquisition
         if fixed && ~error_made
             fixacq = GetSecs;
+            Screen(w,'FillRect',bgcolor)
+            Screen(w,'FillRect',fixcolor,shrinkFixRect);
+            Screen(w,'Flip');
+            if juiceForAcq; giveJuice(1); end
+            %recenterEye;
         elseif ~error_made
             fixacq = 0;
             error_made = 1;
@@ -63,27 +68,34 @@ try
     if ~error_made && targetMode && (overlapMode || memoryMode) && fixationMode
                 
         % Cue onset (keep fix point there)
-        Screen(w,'FillRect',fixcolor,fixRect);
+        Screen(w,'FillRect',fixcolor,shrinkFixRect);
         if gaborTarg
-            Screen('DrawTexture',w,gbIndx,[],targRect,rotTexture);
+            Screen('DrawTexture',w,preGbIndx,[],targRect,rotTexture);
         else
             Screen(w,'FillRect',targcolor,targRect);
         end
         if gaborTarg && choiceTrial
-            Screen('DrawTexture',w,gbIndx,[],altTargRect,0);
+            Screen('DrawTexture',w,preGbIndx,[],altTargRect,0);
         end
         targon = Screen(w,'Flip');
+        tOnLogical = true;
         
         sampleEye;
         
         % Targ viewing period
         while ((GetSecs - targon) < targOverlap) && fixed
             
+            if tOnLogical && (GetSecs - targon) > preTargTime;
+                Screen(w,'FillRect',fixcolor,shrinkFixRect);
+                Screen(w,'Flip');
+                tOnLogical = false;
+            end
+                
             fixed = checkFix(origin, fix_err, space);
             
             if ~fixed
                 error_made = 1;
-                errortype = 2; % broken fixation during overlap
+                errortype = 3; % broken fixation during overlap
             end
             
         end
@@ -111,59 +123,91 @@ try
     
     if ~error_made && targetMode % time to look for fix on ecc targ
         
+        count = 0;
+        while juiceForFixed && checkFix(origin, fix_err, space) && count < dropsForFixed
+            giveJuice(1)
+            count = count+1;
+        end
+        
         % then GO CUE
         if targOnAfterGo || (~memoryMode && ~overlapMode)
             if gaborTarg
                 Screen('DrawTexture',w,gbIndx,[],targRect,rotTexture);
             else
-                Screen(w,'FillRect',targcolor,targRect);
+                Screen(w,'FillRect',targcolor2,targRect);
             end
         end
         if gaborTarg && choiceTrial
             Screen('DrawTexture',w,gbIndx,[],altTargRect,0);
         end
+        
+        % then remove fix
         Screen(w,'FillRect',bgcolor,fixRect)
         goCue = Screen(w,'Flip');
         
+        % let us know when the go cue occurred
+        Eyelink('command', 'draw_box %d %d %d %d 15', round(shrinkFixRect(1)), round(shrinkFixRect(2)), round(shrinkFixRect(3)), round(shrinkFixRect(4)));    
+
+        if  saccadeMode && checkFix(origin, fix_err, space)
         % check for target acquisition
-        acquired = 0;
-        while ((GetSecs - goCue) < time2choose) && ~acquired
-            if checkFix(targOrigin, targ_err, space);
-                targAcq = GetSecs();
-                if choiceTrial % if it's a choice, reward for picking the best
-                    jackpotTrial = 1;
+            acquired = 0; fixed = 1; specialBonus = 0;
+            while ((GetSecs - goCue) < time2choose) && ~acquired
+                if fixed
+                    fixed = checkSaccade(env.threshForSaccade,env.timeForSaccade);
+                    sampleEye;
+                    esc_check;
+                elseif checkFix(targOrigin, targ_err, space) %&& ~checkFix(origin, fix_err, space)
+                    targAcq = GetSecs();
+                    if choiceTrial % if it's a choice, reward for picking the best
+                        jackpotTrial = 1;
+                        % now if this was one of our forced also,
+                        if sum(targIdx==forceTargs) > 0
+                            specialBonus = 1;
+                        end
+                    end
+                    acquired = 1;
+
+
+                    tAcquired = 'high';
+                elseif choiceTrial && checkFix(altTargOrigin, targ_err, space) %&& ~checkFix(origin, fix_err, space)
+                    targAcq = GetSecs;
+                    targOrigin = altTargOrigin; % set selected for holding
+                    jackpotTrial = 0;
+                    %if he goes to an forced alternate to a non-forced targ,
+                    %bonus!
+                    if rwdBonusForcedTargs && sum(altIdx==forceTargs) > 0 && sum(targIdx==forceTargs) == 0
+                        specialBonus = 1;
+                    end
+                    acquired = 1;
+                    tAcquired = 'low';
+                else
+                    sampleEye;
+                    esc_check;
                 end
-                acquired = 1;
-                tAcquired = 'high';
-            elseif choiceTrial && checkFix(altTargOrigin, targ_err, space)
-                targAcq = GetSecs;
-                targOrigin = altTargOrigin; % set selected for holding
-                jackpotTrial = 0;
-                acquired = 1;
-                tAcquired = 'low';
-            else
-                sampleEye;
-                esc_check;
             end
-        end
-        
-        if ~acquired
-            
-            fixed = checkFix(origin, fix_err, space);
-            
-            if fixed && ~error_made
-                error_made = 1; % see if he's still fixing
-                errortype = 4;  % Didn't move eyes
-            elseif ~error_made
-                error_made = 1; % see if he's still fixing
-                errortype = 5;  % Didn't choose targ
+
+            if ~acquired
+
+                fixed = checkFix(origin, fix_err, space);
+
+                if fixed && ~error_made
+                    error_made = 1; % see if he's still fixing
+                    errortype = 4;  % Didn't move eyes
+                elseif ~error_made
+                    error_made = 1; % see if he's still fixing
+                    errortype = 5;  % Didn't choose targ
+                end
+
             end
-            
+        elseif saccadeMode
+           error_made = 1; 
+           errortype = 3; % broke fix before go cue
         end
-        
+%     elseif ~error_made && ~saccadeMode
+%         giveJuice(dropsForFixed);
     end
     
-    if ~error_made && targetMode % Hold fixation of chosen targ
+    if ~error_made && targetMode && saccadeMode % Hold fixation of chosen targ
         
         % remove everything but the chosen targ from the screen
         if choiceTrial
@@ -201,12 +245,16 @@ try
     end
         
     %% OUTCOMES!
+    if (targAcq - goCue) < penalizeShortRTTime
+        error_made = 1;
+        errortype = 3;
+    end
     
     % Some type of error in the trial
     if error_made
         
         errortype
-        if ~isnan(errortype)
+        if ~isnan(errortype) && ((errortype < 3 && noErrForFixed) || ~noErrForFixed)
             Screen(w,'FillRect',errorColor,errorRect);
             errorFeedback = Screen(w,'Flip');
 
@@ -222,11 +270,11 @@ try
             
             % CODE FOR NO FIX
             
-        elseif errortype == 2 % Broken fixation, overlap
+        elseif errortype == 2 % Broken fixation, pre targ
             
             % CODE FOR BROKEN FIX, OVERLAP
             
-        elseif errortype == 3 % Broken fixation, gap
+        elseif errortype == 3 % Broken fixation, post targ
             
             % CODE FOR BROKEN FIX, GAP
         
@@ -247,13 +295,20 @@ try
     else % No errors, correct trial
         
         juiceTime = markEvent('juice');
-        giveJuice(nDropsJuice);
         correct = 1;
+                
+        if juiceForLow; giveJuice(nDropsJuice); end
         
         if jackpotTrial
             for drop = 1:jackpotMultiple
                 giveJuice(nDropsJuice);
             end
+        else
+            WaitSecs(((env.rwdDuration*nDropsJuice*jackpotMultiple)+(env.rwdDelay*nDropsJuice*jackpotMultiple))./1000);
+        end
+        
+        if rwdBonusForcedTargs %% specialBonus &&
+            giveJuice(rwdBonusNJuices);
         end
         
     end

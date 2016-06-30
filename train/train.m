@@ -10,6 +10,7 @@ function train(subjname, mode)
 
 try
     ListenChar(2);
+    error_made = false; jackpotTrial = true;
     
     train_params; % general parameters
     eval(strcat(subjname,'_train_params')) % subject specific parameters
@@ -18,8 +19,15 @@ try
     
     % Run the task
     while trialnum < ntrials && continue_running
-                
-        train_opentrial; % Initialize a new trial
+        
+        if anyRepeat && ((~error_made && ~jackpotTrial && rand < pRepeat) || error_made)
+            train_repeattrial;
+            repeatTrial = true;
+            disp('repeat called')
+        else
+            train_opentrial; % Initialize a new trial
+            repeatTrial = false;
+        end
         train_runtrial;  % Run the trial
         train_closetrial; % Close the trial
         

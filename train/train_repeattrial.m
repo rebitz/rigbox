@@ -14,7 +14,6 @@ targAcq = NaN;  % target acquisition
 trialstart = NaN;   % start of the trial
 juiceTime = NaN;
 tAcquired = NaN;
-altTargTheta = NaN;
 
 alltimes = [];
 
@@ -30,51 +29,51 @@ errortype = NaN;    % type of error made (1 = brokefix, 2 = nochoice (t), 3 = br
 brokeFixTime = NaN; % time of broken fixation
 correct = NaN;  % flag for correct trial
 
-% Target vars
-tmp = Shuffle([1:length(thetas)]);
-targTh = thetas(tmp(1));
-targIdx = tmp(1);
+% just comment out all target related shuffling
 
-tmp = Shuffle([1:length(tOffsets)]);
-targR = tOffsets(tmp(1));
+% % Target vars
+% tmp = Shuffle([1:length(thetas)]);
+% targTh = thetas(tmp(1));
+% targIdx = tmp(1);
+% 
+% tmp = Shuffle([1:length(tOffsets)]);
+% targR = tOffsets(tmp(1));
 
 [t1x, t1y] = pol2cart(deg2rad(targTh),deg2px(targR, env));
 targOrigin = [t1x,t1y]+origin;
 targRect = [targOrigin-targSize targOrigin+targSize];
 
-% jackpot trial?
-jackpotTrial = rand < pJackpot;
-if jackpotTrial && rotateForJackpot
-    rotTexture = rotateBy;
-else
-    rotTexture = 0;
-end
-
-dropsForFixed = round((rand*(max(dropsForFixedSeed)-min(dropsForFixedSeed)))+min(dropsForFixedSeed));
-
-% choice trial? (superceeds last)
-choiceTrial = rand < pChoice;
+% % jackpot trial?
+% jackpotTrial = rand < pJackpot;
+% if jackpotTrial && rotateForJackpot
+%     rotTexture = rotateBy;
+% else
+%     rotTexture = 0;
+% end
+% 
+% % choice trial? (superceeds last)
+% choiceTrial = rand < pChoice;
 if choiceTrial
-    if randomizeAlt
-        altIdx = true(1,length(thetas)); altIdx(targIdx) = false;
-        altTargTheta = targTh; fu = 0;
-        while abs(mod((targTh-altTargTheta) + 180, 360) - 180) < 60 && fu < 25;
-            fu = fu+1;
-            tmpThetas = thetas(altIdx); tmpThetas = Shuffle(tmpThetas);
-            altTargTheta = tmpThetas(1); altIdx = find(thetas==tmpThetas(1));
-        end
-        if fu == 25; altTargTheta = targTh+180; end
-    else
-        altTargTheta = targTh+180; %altIdx = find(thetas==tmpThetas(1));
-    end
+%     if randomizeAlt
+%         altIdx = true(1,length(thetas)); altIdx(targIdx) = false;
+%         altTargTheta = targTh; fu = 0;
+%         while abs(mod((targTh-altTargTheta) + 180, 360) - 180) < 60 && fu < 25;
+%             fu = fu+1;
+%             tmpThetas = thetas(altIdx); tmpThetas = Shuffle(tmpThetas);
+%             altTargTheta = tmpThetas(1); altIdx = find(thetas==tmpThetas(1));
+%         end
+%         if fu == 25; altTargTheta = targTh+180; end
+%     else
+%         altTargTheta = targTh+180; %altIdx = find(thetas==tmpThetas(1));
+%     end
     [t1x, t1y] = pol2cart(deg2rad(altTargTheta),deg2px(targR, env));
     altTargOrigin = [t1x,t1y]+origin;
     altTargRect = [altTargOrigin-targSize altTargOrigin+targSize];
     rotTexture = rotateBy; % rotate the main target
 elseif ~choiceTrial && forceLoc
-    forceTargs = Shuffle(forceTargs);
-    targTh = thetas(forceTargs(1));
-    
+%     forceTargs = Shuffle(forceTargs);
+%     targTh = thetas(forceTargs(1));
+%     
     [t1x, t1y] = pol2cart(deg2rad(targTh),deg2px(targR, env));
     targOrigin = [t1x,t1y]+origin;
     targRect = [targOrigin-targSize targOrigin+targSize];
