@@ -23,7 +23,7 @@ fixcolor = [255 255 255];
 targcolor = [255 255 255];
 
 % baseline timing stuff
-time2fix = 2;
+time2fix = 30;
 time2choose = 1;
 
 % Inter-trial interval bounds (s)

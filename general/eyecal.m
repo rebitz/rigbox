@@ -1,6 +1,7 @@
 function eyecal(nCalPts)
 
-targSizeMultiple = 8;%2.5;
+targSizeMultiple = 12;%2.5;
+targDividable = 5;
 
 % Default to 5-point calibration:
 if nargin<1
@@ -140,10 +141,15 @@ while sharedWorkspace('EYECAL','keepGoing')
     Screen('CopyWindow', blankScreen, w, screenRect, screenRect);
     Screen('Flip', w);
     
-    trialNum = trialNum+1;
+    trialNum = trialNum+1
     % Determine where Eyelink expects the target to appear:
-    [result, targX, targY] = Eyelink('TargetCheck');
-    targRect = shiftPoints(targShape, [targX targY])';
+    [result, targX, targY] = Eyelink('TargetCheck')
+    const.screenCenter
+    if trialNum == 1
+        targRect = shiftPoints(targShape./targDividable, [targX targY])';
+    else
+        targRect = shiftPoints(targShape, [targX targY])';
+    end
     targRect = targRect(:)'; const.targRect = targRect;
    
     % draw target spot:

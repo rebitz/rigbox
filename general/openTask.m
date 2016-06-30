@@ -101,8 +101,8 @@ if EYEBALL
 
             % Calibrate tracker
             Eyelink('StartSetup');
-            %Eyelink('DriftCorrStart', origin(1), origin(2));
-            %Eyelink('ApplyDriftCorr');
+            Eyelink('DriftCorrStart', origin(1), origin(2));
+            Eyelink('ApplyDriftCorr');
 
             % Start of the task
             taskstart = GetSecs;

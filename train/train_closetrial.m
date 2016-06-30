@@ -30,6 +30,8 @@ trials.targOverlap = targOverlap;
 trials.targGap = targGap;
 
 trials.theta = targTh;
+trials.altTargTheta = altTargTheta;
+%trials.altTargOrientation = gOrientation + rotateBy;
 trials.radius = targR;
 trials.targRect = targRect;
 
@@ -37,6 +39,8 @@ trials.correct = correct;
 trials.jackpot = jackpotTrial;
 trials.choiceTrial = choiceTrial;
 trials.juiceTime = juiceTime;
+
+trials.repeatTrial = repeatTrial;
 
 % best choice in choice trials is jackpot == 1
 
