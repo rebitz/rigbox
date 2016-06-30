@@ -20,15 +20,15 @@ bgColor = [0 0 0];
 maxTR = 1000;
 nJuices = 1; % for manual
 maxDur = 6; % max seconds of hold down
-juiceRelease = true;
-nReleaseJuice = 1;
+juiceRelease = true; 
+nReleaseJuice = 3;
 decayJuice = true;
 
-decayConstant = 20; % larger = slower decay
-delayToFirstJuice = 0.05; % make this not synonymous w/ cue onset
+decayConstant = 1.5; % larger = slower decay
+delayToFirstJuice = 0.3; % make this not synonymous w/ cue onset
 flipAtFirstJuice = true;
 juiceBeforeRelease = true;
-iti = .1;
+iti = .25;
 flipOnRelease = true;
 
 % initialize vars
