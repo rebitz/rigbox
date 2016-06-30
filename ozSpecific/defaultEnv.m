@@ -14,10 +14,10 @@ env.rigID = 'Oz'; %
 % juicer stuff
 env.juicePort = hex2dec('DFF8');
 env.rwdBit = 1;
-env.rwdDuration = 60; % in ms
+env.rwdDuration = 60;%75; % in ms
 env.rwdDelay = 50; % in ms
 env.defaultRwdDrops = 1;
 
 % eyelink stuff
-env.eyeToTrack = 'LEFT'; % if not binocular
-env.binocularEye = 'YES'; % 'NO' to pick a particular eye
+env.eyeToTrack = 'RIGHT'; % if no t binocular
+env.binocularEye = 'NO'; % 'NO' to pick a particular eye

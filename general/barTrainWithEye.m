@@ -8,30 +8,31 @@ global env juiceCount ioObj allRects; defaultEnv;
 KbName('UnifyKeyNames');
 
 % set defaults
-maxTR = 37;
+maxTR = 22;
 
 % stimuli/display?
 fullScreen = 0; % full screen color?
     % else:
-    fixSize = 1.3;
+    fixSize = 2.5;
     fixShift = 8;
-    fixWidth = 12; % extra width, in px
 onAtBar = 0; % else on before bar, at start of trial
 cueGoTime = 1; % use the cue to signal go time? else, put up the cue after release
 goColor = [1 .7 .7]; % white
-jackpotColor = [.7 .8 .8]; % another color
-noGoColor = [1 .55 .55]; % gray
+jackpotColor = [.75 .85 .85]; % another color
+noGoColor = [1 .5 .5]; % gray
 bgColor = [0 0 0];
+
+EYEBALL = 1;
+fixErr = 5;
 
 % timings?
 tToGo = 60; % time to wait for first lever press
-tToHoldSeeds = [.7 1.4]; % min max hold time before go
-tWaitInGo = 1; % time to wait for for lever release, s
+tToHoldSeeds = [.48 .88]; % min max hold time before go
+tWaitInGo = 2; % time to wait for for lever release, s
 itiSeeds = [1.1 1.4];
 penaltyWait = .05;
 
-pJuiceAtHold = .9;
-    juiceAtHoldTau = 2.7;
+pJuiceAtHold = .85;
 pJuiceAtGo = 0;
 
 % others?
@@ -58,6 +59,10 @@ sampleFrom = @(x) rand*range(x)+min(x);
 while continueRun
 
     if ~continueRun; break; end
+
+    if EYEBALL;
+        Eyelink('command', 'draw_box %d %d %d %d 15', round(fixRect(1)), round(fixRect(2)), round(fixRect(3)), round(fixRect(4)));    
+    end
     
     waiting = 1;
     while waiting % main body of the code
@@ -70,9 +75,6 @@ while continueRun
         if exist('nextRect');
             fixRect = nextRect; % only update location at tr start
         end
-        
-        holdJuiceTime = 1-exp(-rand(1)/juiceAtHoldTau);
-        holdJuiceTrial = rand < pJuiceAtHold;
         
         if ~onAtBar
             % put up the first cue
@@ -87,31 +89,34 @@ while continueRun
         while (GetSecs() - flipT1) < tToGo && ~barDown
             escStimCheck;
             barCheck;
+            fixed = checkFix(origin, fixErr);
+            if fixed; giveJuice(1); fixed = false; end
         end
         
         if barDown % if sucessful!
             initializeT = GetSecs();
             goOnTrue = true; % allow manual juicing
+
+            if rand < pJuiceAtHold; giveJuice(1); end
             Screen(w,'FillRect',bgColor)
-            Screen(w,'FillRect',noGoColor,fixRect+[-fixWidth 0 fixWidth 0])
+            Screen(w,'FillRect',noGoColor,fixRect)
             flipT1 = Screen(w,'Flip');
         end
 
         while (GetSecs() - initializeT) < tToHold && barDown
-            if holdJuiceTrial && (GetSecs() - initializeT) > holdJuiceTime
-                giveJuice(1); holdJuiceTrial = false;
-            end
             escStimCheck;
             barCheck;
+            fixed = checkFix(origin, fixErr);
+            if fixed; giveJuice(1); fixed = false; end
         end
         
         if cueGoTime && barDown % if we're telling him when to go
             if rand < pJuiceAtGo; giveJuice(1); end
             Screen(w,'FillRect',bgColor)
             if ~jackpotTrial
-                Screen(w,'FillRect',goColor,fixRect+[0 -fixWidth 0 fixWidth])
+                Screen(w,'FillRect',goColor,fixRect)
             else
-                Screen(w,'FillRect',jackpotColor,fixRect+[0 -fixWidth 0 fixWidth])
+                Screen(w,'FillRect',jackpotColor,fixRect)
             end
             flipT2 = Screen(w,'Flip');
         elseif barDown
@@ -122,6 +127,8 @@ while continueRun
         while barDown && (GetSecs() - flipT2) < tWaitInGo
             escStimCheck;
             barCheck;
+            fixed = checkFix(origin, fixErr);
+            if fixed; giveJuice(1); fixed = false; end
         end
         
         if ~barDown && ~isnan(flipT2)
@@ -204,9 +211,50 @@ function prepareEnv
     Screen(w,'Flip');
     
     disp('screens prepared...');
-
+        
     % Define origin of screen
     origin = [(rect(3) - rect(1))/2 (rect(4) - rect(2))/2];
+
+    disp('connecting eyelink...');
+    
+    if EYEBALL
+        try       
+            if Eyelink('IsConnected') ~= 1
+                disp('Trying to connect to Eyelink, attempt #1(/2):');
+                r = Eyelink('Initialize');
+                if r ~= 0
+                    WaitSecs(.5) % wait half a sec and try again
+                    disp('Trying to connect to Eyelink, attempt #2(/2):');
+                    r = Eyelink('Initialize');
+                end
+            elseif Eyelink('IsConnected') == 1
+                r = 0; % means OK initialization
+            end
+
+            if r == 0;
+                disp('Eyelink successfully initialized!')
+                Eyelink('Command', 'screen_pixel_coords = %d %d %d %d', ...
+                    rect(1), rect(2), rect(3), rect(4) );
+                Eyelink('Command', 'link_sample_data = LEFT,RIGHT,GAZE,AREA,PUPIL');
+
+                % Calibrate tracker
+                Eyelink('StartSetup');
+%                 Eyelink('DriftCorrStart', origin(1), origin(2));
+%                 Eyelink('ApplyDriftCorr');
+                
+            elseif r ~= 0
+                % If Eyelink can't initialize: report error and quit
+                disp('Eyelink failed to initialize, check connections');
+                continueRun = 0;
+            end
+
+            Eyelink('StartRecording');
+        catch
+            % If Eyelink can't initialize: report error and quit
+            disp('Eyelink failed to initialize, check connections');
+            continueRun = 0;
+        end
+    end
 
     % sounds, if necessary
     makeAudioFeedback;
@@ -376,6 +424,39 @@ function closeTask
     
     cd(env.home)
     
+end
+
+function fixed = checkFix(object, err)
+    fixed = 0;
+    if EYEBALL
+        checked = 0;
+        
+        while ~checked
+            Eyelink('newfloatsampleavailable');
+            
+            if Eyelink('newfloatsampleavailable')>0;
+
+                evt = Eyelink( 'newestfloatsample');
+                % for tracking the RIGHT eye
+                xR = evt.gx(2); yR = evt.gy(2); paR = evt.pa(2);
+                
+                % for tracking the LEFT eye
+                xL = evt.gx(1); yL = evt.gy(1); paL = evt.pa(1);
+                
+                % now combine so we don't have to think about this again
+                x = [xL, xR]; x(x==-32768) = NaN; x = nanmean(x);
+                y = [yL, yR]; y(y==-32768) = NaN; y = nanmean(y);
+                pa = [paL, paR]; pa(pa==-32768) = NaN; pa = nanmean(pa);
+
+                if (pa > 0) && (abs(x-object(1)) > err || abs(y-object(2)) > err)
+                    fixed = 0;
+                else
+                    fixed = 1;
+                end
+                checked = 1;
+            end
+        end
+    end
 end
 
 end

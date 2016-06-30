@@ -34,18 +34,20 @@ if ~TESTING && EYEBALL
     while ~checked && fixChecking
         
         if Eyelink('newfloatsampleavailable')>0;
-                        
+             
             evt = Eyelink( 'newestfloatsample');
             if strcmp(env.eyeToTrack,'RIGHT')
-                x = evt.gx(2); y = evt.gy(2);
+                x = evt.gx(2); y = evt.gy(2); pa = evt.pa(2);
             elseif strcmp(env.eyeToTrack,'LEFT')
-                x = evt.gx(1); y = evt.gy(1);
+                x = evt.gx(1); y = evt.gy(1); pa = evt.pa(1);
             end
-            
-            if (evt.pa(1) > 0) && (abs(x-object(1)) > err || abs(y-object(2)) > err)
+
+            if (pa > 0) && (abs(x-object(1)) > err || abs(y-object(2)) > err)
                 fixed = 0;
-            else
+            elseif (pa > 0) && (abs(x-object(1)) < err && abs(y-object(2)) < err)
                 fixed = 1;
+            else
+                fixed = 0;
             end
             
             checked = 1;
