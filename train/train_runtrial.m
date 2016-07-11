@@ -71,11 +71,15 @@ try
         Screen(w,'FillRect',fixcolor,shrinkFixRect);
         if gaborTarg
             Screen('DrawTexture',w,preGbIndx,[],targRect,rotTexture);
-        else
+        elseif jackpotTrial
             Screen(w,'FillRect',targcolor,targRect);
+        else
+            Screen(w,'FillRect',altTargColor,targRect);
         end
         if gaborTarg && choiceTrial
             Screen('DrawTexture',w,preGbIndx,[],altTargRect,0);
+        elseif ~gaborTarg && choiceTrial
+            Screen(w,'FillRect',altTargColor,altTargRect);
         end
         targon = Screen(w,'Flip');
         tOnLogical = true;
@@ -133,12 +137,16 @@ try
         if targOnAfterGo || (~memoryMode && ~overlapMode)
             if gaborTarg
                 Screen('DrawTexture',w,gbIndx,[],targRect,rotTexture);
+            elseif jackpotTrial
+                Screen(w,'FillRect',targcolor,targRect);
             else
-                Screen(w,'FillRect',targcolor2,targRect);
+                Screen(w,'FillRect',altTargColor,targRect);
             end
         end
         if gaborTarg && choiceTrial
             Screen('DrawTexture',w,gbIndx,[],altTargRect,0);
+        elseif ~gaborTarg && choiceTrial
+            Screen(w,'FillRect',altTargColor,altTargRect);
         end
         
         % then remove fix
@@ -166,8 +174,6 @@ try
                         end
                     end
                     acquired = 1;
-
-
                     tAcquired = 'high';
                 elseif choiceTrial && checkFix(altTargOrigin, targ_err, space) %&& ~checkFix(origin, fix_err, space)
                     targAcq = GetSecs;
@@ -212,10 +218,19 @@ try
         % remove everything but the chosen targ from the screen
         if choiceTrial
             Screen(w,'FillRect',bgcolor)
-            if jackpotTrial
-                Screen('DrawTexture',w,gbIndx,[],targRect,rotTexture);
+            
+            if jackpotTrial 
+                if gaborTarg
+                    Screen('DrawTexture',w,gbIndx,[],targRect,rotTexture);
+                else
+                    Screen(w,'FillRect',targcolor,targRect);
+                end
             elseif  ~jackpotTrial
-                Screen('DrawTexture',w,gbIndx,[],altTargRect,0);
+                if gaborTarg
+                    Screen('DrawTexture',w,gbIndx,[],altTargRect,0);
+                else
+                    Screen(w,'FillRect',altTargColor,altTargRect);
+                end
             end
             Screen(w,'Flip');
         end

@@ -49,6 +49,22 @@ trials.errortype = errortype;
 
 trials.eyedata = samples;
 
+% thetas
+if exist('correctionVector') ~=1
+    correctionVector = ones(size(thetas)).*0.5;
+end
+
+if correct && jackpotTrial
+    correctionVector(thetas==altTargTheta) = correctionVector(thetas==altTargTheta) - 0.05;
+elseif correct % missed the jackpot, make that loc more likely
+    correctionVector(thetas==altTargTheta) = correctionVector(thetas==altTargTheta) + 0.05;
+end
+
+% wrap
+correctionVector = min([correctionVector; 1 1]);
+correctionVector = max([correctionVector; 0 0]);
+correctionVector
+
 if EYEBALL
     r = Eyelink('RequestTime');
     if r == 0
