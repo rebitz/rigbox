@@ -31,14 +31,19 @@ folder = {'bun031516','bun031616','bun031716','bun031816',...
     'bun042816','bun042916','bun050116','bun050216',...
     'bun050316','bun050416','bun050516','bun050616'}
 saveNew = false;
-saveNew = true;
+%saveNew = true;
 
 % from 5/09 to 5/12, started messing w/ task
 %       running him on an overlap task
 %       got corrects properly coded towards the end of 5/11
 
+folder = {'bun063016','bun070116','bun070516','bun070616','bun070716',...
+    'bun070816'}
+
+% switched to color in: 'bun070916'
+
 % JUST TODAY
-folder = {'bun062916'}
+folder = {'bun070916'}
 
 cd(strcat(gitDir,splitChar,'train',splitChar,'data'));
 
@@ -309,7 +314,7 @@ if length(unique([out.session])) > 1
         nAttempted(i) = nansum(idx);
         nCorrectTrial(i) = nansum([out(idx).correct]);
         idx = and(idx,[out.correct]==1);
-        nCorrectChoice(i) = nansum([out(idx).jackpot]);
+        nCorrectChoice(i) = nansum([out(idx).jackpot]);  
     end
     bar(nAttempted,'FaceColor','w');
     bar(nCorrectTrial); bar(nCorrectChoice,'FaceColor','k');
@@ -318,15 +323,15 @@ if length(unique([out.session])) > 1
     legend('total','correct','best choice','Location','NorthWest')
 end
 
-repeats = nanmean([out(and([out.repeatTrial]==1,[out.correct]==1)).jackpot]);
-norepeats = nanmean([out(and([out.repeatTrial]==0,[out.correct]==1)).jackpot]);
-
-fprintf('pcnt best choice, not a repeat: %2.1f \n',norepeats*100)
-fprintf('        repeat trials: %2.1f \n',repeats*100)
+% repeats = nanmean([out(and([out.repeatTrial]==1,[out.correct]==1)).jackpot]);
+% norepeats = nanmean([out(and([out.repeatTrial]==0,[out.correct]==1)).jackpot]);
+% 
+% fprintf('pcnt best choice, not a repeat: %2.1f \n',norepeats*100)
+% fprintf('        repeat trials: %2.1f \n',repeats*100)
 
 %% sliding accuracy plot
 
-tmper = 10;
+tmper = 15;
 
 % get chance levels (ish)
 % nBoot = 1000; ref = NaN(2,nBoot);
@@ -490,7 +495,7 @@ end
 %% over time, relative to switches in what is jackpotted
 % CURRENTLY CONFLATED W/TIME W/IN SESSION/BLOCK!!!
 if length(unique([out.jackpotOrientation])) > 1
-    beh = 'error';
+    %beh = 'error';
     %beh = 'rt';
     %beh = 'choice'
     pre = 10; post = 15; binWidth = 5;
