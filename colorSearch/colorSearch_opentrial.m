@@ -13,6 +13,7 @@ fixacq = NaN;   % fixation acquired
 fixoff = NaN;   % fixation removal
 cueonT = NaN;   % cue on time
 cueoffT = NaN;   % cue off time
+targacq = NaN;
 targon = NaN;
 targonT = NaN;  % stimuli appearance
 goCue = NaN;
@@ -66,14 +67,32 @@ brokeFixTime = NaN; % time of broken fixation
 correct = NaN;  % flag for correct trial
 
 % Target generation:
-% what colors will our targets have on this trial?
-% targIndx = randi(nColors,nTargs,1); % w/ replacement, but we want without:
-targIndx = Shuffle(1:nColors); targIndx = targIndx(1:nTargs);
+
+% set up forced choice trials
+forced = rand < pForced;
+
+if ~forced
+    localNTargs = nTargs;
+    
+    % what colors will our targets have on this trial?
+    % targIndx = randi(nColors,nTargs,1); % w/ replacement, but we want without:
+    targIndx = Shuffle(1:nColors); targIndx = targIndx(1:nTargs);
+
+    % where will these targets be placed in space?
+    targSlots = convertProb(nTargs/nLocs,nLocs)';
+else
+    localNTargs = 1;
+    
+    if ~forceBest
+        targIndx = Shuffle(1:nColors); targIndx = targIndx(1);
+    else
+        [~,targIndx] = min(abs(mod((rwdSeed-colorOrientations) + 360/2, 360) - 360/2));
+    end
+    targSlots = convertProb(1/nLocs,nLocs)'; % one location to check and display
+end
+
 theseColors = colorSeeds(targIndx,:);
 theseOrientations = colorOrientations(targIndx);
-
-% where will these targets be placed in space?
-targSlots = convertProb(nTargs/nLocs,nLocs)';
 
 % get the thetas of our selected targets
 tmp = targSlots.*thetas;
@@ -90,6 +109,7 @@ targRect = [targOrigin targOrigin] + repmat([-targSize -targSize targSize targSi
 % radOrientations = (theseOrientations/(range(orientationBounds)/2))*pi;
 angDist = abs(mod((rwdSeed-theseOrientations) + 360/2, 360) - 360/2);
 theseRwds = (maxRwd-minRwd)*exp(-((angDist.^2)/(2*rwdStd.^2)))+minRwd;
+
 
 % Increment trialnum
 trialnum = trialnum + 1;

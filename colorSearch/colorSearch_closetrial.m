@@ -44,6 +44,7 @@ trials.switchTrial = switchTrial;
 trials.rwdSeed = rwdSeed;
 
 % performance information
+trials.forced = forced;
 trials.correct = correct; % chose a target?
 trials.chosenTarg = choice; % which target?
 

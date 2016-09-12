@@ -31,7 +31,14 @@ brokeFixTime = NaN; % time of broken fixation
 correct = NaN;  % flag for correct trial
 
 % Target vars
-tmp = Shuffle([1:length(thetas)]);
+try,
+    weights = nanmean([correctionVector;[.1 .1]]);
+    weights = weights/sum(weights)
+    tmp = datasample(fliplr([1:length(thetas)]),1, 'Weights',weights);
+catch
+    tmp = Shuffle([1:length(thetas)]);
+end
+
 targTh = thetas(tmp(1));
 targIdx = tmp(1);
 

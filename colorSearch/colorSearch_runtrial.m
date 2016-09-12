@@ -38,7 +38,11 @@ try
 
         % If fixation acquired, record time of acquisition
         if fixed && ~error_made
-            fixacq = GetSecs;
+            %fixacq = GetSecs;
+            
+            Screen(w,'FillRect',fixcolor,fixRect+shrinkFix);
+            fixacq = Screen(w,'Flip');
+            
         elseif ~error_made
             fixacq = 0;
             error_made = 1;
@@ -62,7 +66,7 @@ try
         % draw cue??
         
         % Fixation on top
-        Screen(w,'FillRect',fixcolor,fixRect)
+        Screen(w,'FillRect',fixcolor,fixRect+shrinkFix)
         cueonT = Screen(w,'Flip');
         
         sampleEye;
@@ -80,7 +84,7 @@ try
         end
         
         % then turn off the cue
-        Screen(w,'FillRect',fixcolor,fixRect)
+        Screen(w,'FillRect',fixcolor,fixRect+shrinkFix)
         cueoffT = Screen(w,'Flip');
     end
     
@@ -100,35 +104,30 @@ try
         
         % first onto eyelink
         if EYEBALL
-            for i = 1:nTargs
+            for i = 1:localNTargs
                 Eyelink('command', 'draw_box %d %d %d %d 15', ...
                     round(targRect(i,1)), round(targRect(i,2)), round(targRect(i,3)), round(targRect(i,4)));
             end
         end
         
         % then pbox
-        for i = 1:nTargs
+        for i = 1:localNTargs
             Screen(w,'FillRect',theseColors(i,:),targRect(i,:));
         end
-        Screen(w,'FillRect',fixcolor,fixRect)
+        
+        if ~fixOffAtTargOn
+            Screen(w,'FillRect',fixcolor,fixRect+shrinkFix)
+        end
         targon = Screen(w,'Flip');
 
     end
     
     if ~error_made % time to search for a target selection!
-        
-        % Fixation offset == go cue
-        for i = 1:nTargs
-            Screen(w,'FillRect',theseColors(i,:),targRect(i,:));
-        end
-        Screen(w,'FillRect',env.colorDepth/2,fixRect)
-        fixoff = Screen(w,'Flip');
-        fixStillOn = 0;
 
         locsToCheck = find(targSlots);
         
         choiceMade = 0;
-        while ((GetSecs - fixoff) < time2choose) && choiceMade == 0
+        while ((GetSecs - targon) < time2choose) && choiceMade == 0
             for i = 1:length(locsToCheck)
                 if checkFix(targOrigin(i,:), targ_err, targKey(i))
                     choice = i;
@@ -180,6 +179,7 @@ try
         Screen(w,'FillRect',theseColors(choice,:),targRect(choice,:))
     end
     targoff = Screen(w,'Flip');
+    fixStillOn = 0;
     
     % if some type of error in the trial
     if error_made
@@ -225,7 +225,7 @@ try
         
         if rewarded
             juiceTime = markEvent('juice');
-            giveJuice;
+            giveJuice(nDropsJuice);
         else
             juiceTime = GetSecs();
             if ~EYEBALL; sound(env.norwdSound, env.soundSF); end

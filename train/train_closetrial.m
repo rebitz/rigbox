@@ -34,6 +34,8 @@ trials.altTargTheta = altTargTheta;
 %trials.altTargOrientation = gOrientation + rotateBy;
 trials.radius = targR;
 trials.targRect = targRect;
+trials.targColor = targcolor;
+trials.altTargColor = altTargColor;
 
 trials.correct = correct;
 trials.jackpot = jackpotTrial;
@@ -51,7 +53,7 @@ trials.eyedata = samples;
 
 % thetas
 if exist('correctionVector') ~=1
-    correctionVector = ones(size(thetas)).*0.5;
+    correctionVector = ones(size(thetas));
 end
 
 if correct && jackpotTrial
@@ -64,6 +66,10 @@ end
 correctionVector = min([correctionVector; 1 1]);
 correctionVector = max([correctionVector; 0 0]);
 correctionVector
+if sum(correctionVector) < 1.5;
+    pChoice = 0.85;
+    disp('increased choice prob')
+end
 
 if EYEBALL
     r = Eyelink('RequestTime');

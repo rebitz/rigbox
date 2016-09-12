@@ -58,6 +58,8 @@ diodeColor = [255 255 255];
 % Setup stimuli and fixation rects
 fixSize = deg2px(fixSize, env)./2;
 fixRect = [origin origin] + [-fixSize -fixSize fixSize fixSize];
+tmp = (fixSize*shrinkFixBy);
+shrinkFix = [tmp tmp -tmp -tmp];
 fix_err = deg2px(fix_err, env)./2;
 
 targSize = deg2px(targSize, env)./2;

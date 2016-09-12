@@ -122,7 +122,7 @@ end
 %% feedback stuff:
 
 errorSize = 8;
-errorColor = [0 128 0];
+errorColor = [0 0 0];
 errorSecs = 0.5;
 
 makeAudioFeedback;

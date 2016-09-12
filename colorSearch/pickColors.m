@@ -22,8 +22,8 @@ end
 
 % apply some kind of matrix transform:
 transformMx = eye(2,2);
-transformMx(1,2) = -.5; transformMx(2,1) = -.2; % sheer
-transformMx(1,1) = 1.1; transformMx(2,2) = 1.25; % stretch
+% transformMx(1,2) = -.5; transformMx(2,1) = -.2; % sheer
+% transformMx(1,1) = 1.1; transformMx(2,2) = 1.25; % stretch
 shiftMx = [0,0];%[20,15];
 tmp = [a,b]*transformMx + repmat(shiftMx,length(a),1);
 a = tmp(:,1); b = tmp(:,2);
