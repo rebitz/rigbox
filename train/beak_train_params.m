@@ -1,11 +1,15 @@
 % for this specific monkey, set some additional parameters
 
+% Number of trials
+ntrials = 70;
+
 % WHAT MODE ARE WE IN?
 fixationMode = 1;
+    fixationP = 1;
 targetMode = 1; % targ on at all?
     % this guy supercedes all that come below it
     saccadeMode = 1; % reward for making saccades
-overlapMode = 1; % targ on before fix off?
+overlapMode = 0; % targ on before fix off?
 targOnAfterGo = 1; % have the target on after fix off go cue?
     % combining these two is a simple overlap task
 memoryMode = 0; % turn targ off at any point before fix off?
@@ -13,7 +17,9 @@ memoryMode = 0; % turn targ off at any point before fix off?
 rmTargB4Rwd = 0; % 1 = targ off b4 rwd, else, targ on until after rwd
 gracePeriod = 0;
     graceTime = 0.04;
-    
+
+toggle = true;
+
 pRepeat = 0.35;
     anyRepeat = false;
     
@@ -34,33 +40,45 @@ gaborTarg = 0; % superceeded by below!
 rotateForJackpot = 1;
     rotateBy = 90;
     
-pChoice = 0; % 0 = single target  
+pChoice = 100; % 0 = single target  
     
 % walk up the baground color to neutral gray
-bgcolor = repmat(30,1,3);
+bgcolor = repmat(100,1,3);
 targcolor = repmat(255,1,3); % pre go, if not gabor
 targcolor2 = repmat(255,1,3); % post go, if not gabor
 
-nDropsJuice = 2;
+%tmp = pickColors(2).*255;
+
+% tmp = [    0.6902    0.2506    0.2006;...
+%     0.0119    0.4219    0.5024].*255;
+
+tmp = [    0.9403    0.3526    0.4246;...
+    0.1016    0.5926    0.5181].*255;
+
+% targcolor = pickColors(1)*255;
+% altTargColor = repmat(255,1,3);
+
+targcolor = tmp(1,:);
+altTargColor = tmp(2,:);
+
+nDropsJuice = 1;
 juiceForLow = true;
 juiceForAcq = false;
 juiceForFixed = false; % after overlap
     dropsForFixedSeed = [-0.5 1];
     noErrForFixed = true;
 %pJackpot = 0;
-jackpotMultiple = 2;
-
+jackpotMultiple = 4;
+    pJackpot = .5; % jackpot likelihood on forced trials
+    
 errorSecs = 0.2;
 
-% Number of trials
-ntrials = 100;
-
 % Timing windows:
-targHoldTime = 0.13; % time to hold target fix
+targHoldTime = 0.08; % time to hold target fix
 penalizeShortRTTime = 0.03; % no acceptable RTs less than this number
 
-fixHoldMin = 0.20; % time to hold fixation
-fixHoldMax = 0.35;
+fixHoldMin = 0.24;%3;%24; % time to hold fixation
+fixHoldMax = 0.36;%5;%39;
 
 targOverlapMin = 0.05; % targ on before fix off t
 targOverlapMax = 0.11;
@@ -69,25 +87,26 @@ targGapMin = 0.5; % targ off before go cue t
 targGapMax = 0.8;
 
 % Fixation size
-fixSize = 1.1; % in dg (radius)
-shrinkFixSize = .7;
+fixSize = 1; % in dg (radius), og fix size
+shrinkFixSize = .6;
 
 % Target size
-targSize = 1.1;
+targSize = 2.5;
 if gaborTarg; targSize = 7; end % not implemented!!!
 
 % Allowable error
-fix_err = 6; % in dg
-targ_err = 10; % in dg
+fix_err = 4.5; % in dg was: 4.5
+targ_err = 6; % in dg
 
 % target locations
-nLoc = 8; % number of positions around the circle
+nLoc = 2; % number of positions around the circle
+startAt = 15;
 nEcc = 1; % number of eccentricities
-thetas = [1:360/nLoc:360]; % evenly spaced (degrees)
-tOffsets = [6]; % targ offsets/eccentricities (degrees)
+thetas = [startAt:360/nLoc:360]; % evenly spaced (degrees)
+tOffsets = [5]; % targ offsets/eccentricities (degrees)
 
-itimin = .15;
-itimax = .25;
+itimin = .28;
+itimax = .45;
 
 %nLoc = 2;
 %thetas = [46 226];
@@ -99,5 +118,4 @@ randomizeAlt = 1; % put the alternatives anywhere else on the screen?
     % else, always 180deg away
 rwdBonusForcedTargs = 0; % reward for choices to forced targs?
     rwdBonusNJuices = 0;
-pChoice = 0; % 1-p(forced)
-pJackpot = .25; % jackpot likelihood on forced trials
+%pChoice = 0; % 1-p(forced)

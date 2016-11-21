@@ -28,14 +28,49 @@ try
         Screen(w,'FillRect',bgcolor)
         Screen(w,'FillRect',fixcolor,fixRect);
         fixon = Screen(w,'Flip');
+        fOn = true;
 
         sampleEye;
 
         % Wait for fixation
-        fixed = 0;
+        fixed = 0; colors = [targcolor; altTargColor];
+        big = 10; count = 1; iter = 1;
         while (GetSecs - fixon) < time2fix && ~fixed && ~error_made
             fixed = checkFix(origin, fix_err, space);
             esc_check;
+            if toggle && (GetSecs - fixon) > 1;
+                if count > 5
+                    big = big + 3;
+                    count = 1;
+                end
+                if fOn == true;
+                    Screen(w,'FillRect',bgcolor)
+                    Screen(w,'FillRect',fixcolor,fixRect);
+                    Screen(w,'Flip');
+                    fOn = false;
+                else
+                    if rand < 0.05; iter = 3; end
+                    switch iter
+                        case 1
+                            iter = 2;
+                            color = colors(2,:)*255;
+                        case 2
+                            iter = 1;
+                            color = colors(1,:)*255;
+                        case 3
+                            color = rand(1,3)*255;
+                            iter = 1;
+                    end
+
+                    Screen(w,'FillRect',bgcolor)
+                    Screen(w,'FillRect',color,fixRect+[-big -big big big]);
+                    Screen(w,'FillRect',fixcolor,fixRect);
+                    %Screen(w,'FillRect',fixcolor,fixRect+[-big -big big big]);
+                    Screen(w,'Flip');
+                    fOn = true;
+                end
+                WaitSecs(0.13); count = count+1;
+            end
         end
 
         % If fixation acquired, record time of acquisition
@@ -79,6 +114,7 @@ try
         if gaborTarg && choiceTrial
             Screen('DrawTexture',w,preGbIndx,[],altTargRect,0);
         elseif ~gaborTarg && choiceTrial
+            Screen(w,'FillRect',targcolor,targRect);
             Screen(w,'FillRect',altTargColor,altTargRect);
         end
         targon = Screen(w,'Flip');
@@ -134,6 +170,7 @@ try
         end
         
         % then GO CUE
+        Screen(w,'FillRect',fixcolor,shrinkFixRect);
         if targOnAfterGo || (~memoryMode && ~overlapMode)
             if gaborTarg
                 Screen('DrawTexture',w,gbIndx,[],targRect,rotTexture);
@@ -146,6 +183,7 @@ try
         if gaborTarg && choiceTrial
             Screen('DrawTexture',w,gbIndx,[],altTargRect,0);
         elseif ~gaborTarg && choiceTrial
+            Screen(w,'FillRect',targcolor,targRect);
             Screen(w,'FillRect',altTargColor,altTargRect);
         end
         
@@ -269,7 +307,7 @@ try
     if error_made
         
         errortype
-        if ~isnan(errortype) && ((errortype < 3 && noErrForFixed) || ~noErrForFixed)
+        if ~isnan(errortype) && errortype > 2 %%((errortype > 3 && noErrForFixed) || ~noErrForFixed)
             Screen(w,'FillRect',errorColor,errorRect);
             errorFeedback = Screen(w,'Flip');
 

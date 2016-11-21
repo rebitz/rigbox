@@ -31,6 +31,10 @@ brokeFixTime = NaN; % time of broken fixation
 correct = NaN;  % flag for correct trial
 
 % Target vars
+if fixationP > 0 && fixationP < 1;
+    fixationMode = rand < fixationP;
+end
+
 try,
     weights = nanmean([correctionVector;[.1 .1]]);
     weights = weights/sum(weights)
@@ -60,6 +64,7 @@ end
 dropsForFixed = round((rand*(max(dropsForFixedSeed)-min(dropsForFixedSeed)))+min(dropsForFixedSeed));
 
 % choice trial? (superceeds last)
+pChoice
 choiceTrial = rand < pChoice;
 if choiceTrial
     if randomizeAlt

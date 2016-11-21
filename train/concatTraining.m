@@ -41,9 +41,18 @@ folder = {'bun063016','bun070116','bun070516','bun070616','bun070716',...
     'bun070816'}
 
 % switched to color in: 'bun070916'
+%'beak091416','beak091516','beak091616','beak091916','beak092016',...
+%'beak092116','beak092216','beak092816','beak092916','beak100316',...
+%'beak100416','beak100516','beak100616'
+%
+% choices forward (ish):
+% 'beak101216','beak101316','beak101416','beak102116','beak102716',...
+% 'beak102816','beak102916','beak103116','beak110116','beak110216',...
+% 'beak110316','beak110416','beak110716','beak110816','beak110916',...
+% 'beak111016'
 
 % JUST TODAY
-folder = {'bun070916'}
+folder = {'beak111116'}
 
 cd(strcat(gitDir,splitChar,'train',splitChar,'data'));
 
@@ -182,7 +191,7 @@ fprintf('   excluding preTarg: %2.1f \n',(1-nanmean([out.errortype]>2))*100)
 
 avgRT = sprintf(' %3.0f ms ',nanmean([out.rt])*1000);
 stdRT = sprintf(' %3.0f',nanstd([out.rt])*1000);
-
+ 
 % initialize our plotting window
 figure('Position', [680   341   891  637]);
     
@@ -374,7 +383,7 @@ end
 set(h,'Color','r')
 end
 
-%% check out the spatial distribution of jackpots (correct choices), RTs, and all choices
+ %% check out the spatial distribution of jackpots (correct choices), RTs, and all choices
 
 figure('Position',[480 611 1334 367]);
 for plotWhat = 1:3
