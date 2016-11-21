@@ -65,6 +65,7 @@ end
 % wrap
 correctionVector = min([correctionVector; ones(size(correctionVector))]);
 correctionVector = max([correctionVector; zeros(size(correctionVector))]);
+
 correctionVector;
 if sum(correctionVector) < 1.5 && pChoice < 1;
     pChoice = pChoice+0.05;

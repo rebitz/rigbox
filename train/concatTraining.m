@@ -38,7 +38,12 @@ saveNew = false;
 %       got corrects properly coded towards the end of 5/11
 
 folder = {'bun063016','bun070116','bun070516','bun070616','bun070716',...
-    'bun070816'}
+    'bun070816','bun070916','bun071116','bun071216','bun071316',...
+    'bun071416','bun071816','bun071916','bun072016','bun082416',...
+    'bun082516','bun082616','bun082916','bun083016','bun083116'}
+
+folder = {'bun082416','bun082516','bun082616','bun082916',...
+    'bun083016','bun083116','bun090216','bun090716','bun090816'};
 
 % switched to color in: 'bun070916'
 %'beak091416','beak091516','beak091616','beak091916','beak092016',...
@@ -132,7 +137,9 @@ if ~processed
             if ~isfield(trials,'jackpotOrientation'); [trials.jackpotOrientation] = NaN; end
             if ~isfield(trials,'otherOrientation'); [trials.otherOrientation] = NaN; end
             if ~isfield(trials,'repeatTrial'); [trials.repeatTrial] = deal(false); end
-             
+            if ~isfield(trials,'targColor'); [trials.targColor] = deal(NaN); end
+            if ~isfield(trials,'altTargColor'); [trials.altTargColor] = deal(NaN); end
+
             if ~isfield(trials,'altTargTheta');
                 tmp = num2cell([trials.theta]+180);
                 [trials.altTargTheta] = deal(tmp{:});
@@ -164,6 +171,8 @@ end
 if ~isfield(data,'jackpotOrientation'); [data.jackpotOrientation] = deal(NaN); end
 if ~isfield(data,'otherOrientation'); [data.otherOrientation] = deal(NaN); end
 if ~isfield(data,'repeatTrial'); [data.repeatTrial] = deal(false); end
+if ~isfield(data,'targColor'); [data.targColor] = deal(NaN); end
+if ~isfield(data,'altTargColor'); [data.altTargColor] = deal(NaN); end
 
 out = [out data];
 
@@ -213,14 +222,16 @@ ylim([0 1])
 % plot broken fix error likelihood against fix time
 nbins = 8;
 subplot(2,2,3); hold on;
-for i = 1:3
+for i = 1%:3
     switch i
         case 1; x = [out.fixHold]; c = 'r';
         case 2; x = [out.goCue]-[out.fixOn]; c = 'k';
         case 3; x = ([out.goCue]-[out.fixOn])-[out.fixHold]; c = 'b';
     end
+ %x = [out.rt]; c = 'r';
+
         y = or([out.errortype]==2,[out.errortype]==3);
-        y = [out.errortype]==3;
+        %y = [out.errortype]==3;
          
         xpos = [min(x):range(x)/nbins:max(x)];
         %xpos = [0:.1:1.5];
@@ -340,7 +351,7 @@ end
 
 %% sliding accuracy plot
 
-tmper = 15;
+tmper = 10;
 
 % get chance levels (ish)
 % nBoot = 1000; ref = NaN(2,nBoot);
@@ -374,8 +385,14 @@ h = line([xLim(1) xLim(2)],[ci(1) ci(1)]);
 h(2) = line([xLim(1) xLim(2)],[ci(2) ci(2)]);
 set(h,'LineStyle','--');
 
-switches = find(abs(diff([[out(1).jackpotOrientation],[out.jackpotOrientation]]))>1);
-switches = [switches find(abs(diff([[out(1).otherOrientation],[out.otherOrientation]]))>1)];
+% find changes in orientation or color
+switches = find(abs(diff([out.jackpotOrientation]))>1);
+switches = [switches find(abs(diff([out.otherOrientation]))>1)];
+tmp = vertcat(out.targColor);
+switches = [switches find(abs(diff(tmp(:,1)))>1)];
+tmp = vertcat(out.altTargColor);
+switches = [switches; find(abs(diff(tmp(:,1)))>1)];
+switches = unique(switches);
 try, clear h;
 for i = 1:length(switches)
     h(i) = line([switches(i) switches(i)],[yLim(1) yLim(2)]);
@@ -504,14 +521,22 @@ end
 %% over time, relative to switches in what is jackpotted
 % CURRENTLY CONFLATED W/TIME W/IN SESSION/BLOCK!!!
 if length(unique([out.jackpotOrientation])) > 1
-    %beh = 'error';
+    beh = 'error';
     %beh = 'rt';
     %beh = 'choice'
-    pre = 10; post = 15; binWidth = 5;
+    pre = 10; post = 50; binWidth = 3;
     figure();
     %switches = find(abs(diff([[out(1).jackpotOrientation],[out.jackpotOrientation]]))>1);
-    switches = find([or(diff([out.jackpotOrientation])~=0,diff([out.otherOrientation])~=0)]);
+    %switches = find([or(diff([out.jackpotOrientation])~=0,diff([out.otherOrientation])~=0)]);
     
+    switches = find(abs(diff([out.jackpotOrientation]))>1);
+switches = [switches find(abs(diff([out.otherOrientation]))>1)];
+tmp = vertcat(out.targColor);
+switches = [switches find(abs(diff(tmp(:,1)))>1)];
+tmp = vertcat(out.altTargColor);
+switches = [switches find(abs(diff(tmp(:,1)))>1)];
+switches = unique(switches);
+
     [m,e,p] = deal(NaN(2,pre+post));
     for i = 1:pre+post
         if i == 1;

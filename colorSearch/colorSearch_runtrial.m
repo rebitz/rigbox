@@ -64,6 +64,10 @@ try
     if ~error_made && cueing % put up the cue stuff
         
         % draw cue??
+        % we'll just use the actual targets
+        for i = 1:localNTargs
+            Screen(w,'FillRect',theseColors(i,:),targRect(i,:));
+        end
         
         % Fixation on top
         Screen(w,'FillRect',fixcolor,fixRect+shrinkFix)
@@ -108,6 +112,9 @@ try
                 Eyelink('command', 'draw_box %d %d %d %d 15', ...
                     round(targRect(i,1)), round(targRect(i,2)), round(targRect(i,3)), round(targRect(i,4)));
             end
+            [~,bidx] = max(theseRwds);
+            Eyelink('command', 'draw_box %d %d %d %d 15', ...
+                    round(targRect(bidx,1))-10, round(targRect(bidx,2))-10, round(targRect(bidx,3)), round(targRect(bidx,4)));
         end
         
         % then pbox
@@ -184,6 +191,16 @@ try
     % if some type of error in the trial
     if error_made
 
+        if ~isnan(errortype)
+            Screen(w,'FillRect',errorColor,errorRect);
+            errorFeedback = Screen(w,'Flip');
+
+            while ((GetSecs - errorFeedback) < errorSecs)
+                sampleEye;
+                esc_check;
+            end
+        end
+        
         if errortype == 1 % No fixation
             
             % CODE FOR NO FIX

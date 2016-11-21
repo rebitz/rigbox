@@ -2,6 +2,8 @@ function eyecal(nCalPts)
 
 targSizeMultiple = 4;
 targDividable = 1;
+targSizeMultiple = 2.5;%2.5;
+targDividable = 5;
 
 % Default to 5-point calibration:
 if nargin<1
