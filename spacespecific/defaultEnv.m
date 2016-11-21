@@ -9,12 +9,12 @@ env.width = env.resolution.width;
 env.distance = 70; % in cm, monkey from screen
 env.physicalWidth = 61; % in cm, width of the visible screen
 env.colorDepth = 255;
-env.rigID = 'OuterSpace'; %
+env.rigID = 'OuterSpace'; %  
 
 % juicer stuff
 env.juicePort = hex2dec('DFF8');
 env.rwdBit = 1;
-env.rwdDuration = 30; % in ms
+env.rwdDuration = 30; % in ms, was 30x5drp
 env.rwdDelay = 55; % in ms
 env.defaultRwdDrops = 1;
 

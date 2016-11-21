@@ -7,7 +7,7 @@ if nargin < 1
 end
 
 nColorSamples = 1000; % for creating the distribution
-lum = 65; % range = 0 to 100
+lum = 73; % range = 0 to 100
 ecc = 35;
 
 % samples around a circle: clunky legacy way of doing this

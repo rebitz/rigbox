@@ -63,8 +63,8 @@ elseif correct % missed the jackpot, make that loc more likely
 end
 
 % wrap
-correctionVector = min([correctionVector; 1 1]);
-correctionVector = max([correctionVector; 0 0]);
+correctionVector = min([correctionVector; ones(size(correctionVector))]);
+correctionVector = max([correctionVector; zeros(size(correctionVector))]);
 correctionVector
 if sum(correctionVector) < 1.5;
     pChoice = 0.85;

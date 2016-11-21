@@ -35,20 +35,29 @@ rewarded = NaN;
 whichCued = NaN;
 
 % now reseed the probability of reward if necessary
-if trialnum == 0
+if trialnum == 0 && exist('seedSeed')~=1
     rwdSeed = colorOrientations(randi(nColors));%colorOrientations(1) + range(colorOrientations).*rand;
     trSince = 0;
-elseif (switchTrial && nanmean(rwdBuffer)>=rwdsRequired && trSince > trSinceMin)
+elseif trialnum == 0 &&  exist('seedSeed')==1
+    rwdSeed = seedSeed;
+    trSince = 0;
+elseif (switchTrial && nanmean(rwdBuffer)>=rwdsRequired && ~isnan(rwdBuffer(end)) && nanmean(~isnan(rwdBuffer)) > .65 && trSince > trSinceMin)
     disp('SWITCH TRIAL!')
     disp('rewards are a-changing')
     
-    % make sure we take a big jump
-    oldSeed = rwdSeed; angDist = 0;
+    if exist('nextSeed')==1
+        rwdSeed = nextSeed;
+        clear nextSeed;
+    else        
+        % make sure we take a big jump
+        oldSeed = rwdSeed; angDist = 0;
         
-    while angDist < minJump % require it to be above some minimum
-        rwdSeed = colorOrientations(randi(nColors));%colorOrientations(1) + range(colorOrientations).*rand;
-        angDist = abs(mod((rwdSeed-oldSeed) + 360/2, 360) - 360/2);
+        while angDist < minJump % require it to be above some minimum
+            rwdSeed = colorOrientations(randi(nColors));%colorOrientations(1) + range(colorOrientations).*rand;
+            angDist = abs(mod((rwdSeed-oldSeed) + 360/2, 360) - 360/2);
+        end
     end
+    
     trSince = 0;
 else
     trSince = trSince + 1;

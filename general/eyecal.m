@@ -1,6 +1,6 @@
 function eyecal(nCalPts)
 
-targSizeMultiple = 12;%2.5;
+targSizeMultiple = 2.5;%2.5;
 targDividable = 5;
 
 % Default to 5-point calibration:
