@@ -63,45 +63,54 @@ try
     
     if ~error_made && cueing % put up the cue stuff
         
-        % draw cue??
-        % we'll just use the actual targets
-        for i = 1:localNTargs
-            Screen(w,'FillRect',theseColors(i,:),targRect(i,:));
-        end
-        
-        % Fixation on top
-        Screen(w,'FillRect',fixcolor,fixRect+shrinkFix)
-        cueonT = Screen(w,'Flip');
-        
-        sampleEye;
-        
-        % Cue viewing period
-        while ((GetSecs - cueonT) < cueOn) && fixed
+        cue = 1; % count the number we've presented
+        while cue <= trialNCues && ~error_made
             
-            fixed = checkFix(origin, fix_err, space);
+            % draw first cue??
+            % we'll just use the actual targets
+            for i = 1:localNTargs
+                Screen(w,'FillRect',cueColors(cue,:),targRect(i,:));
+            end
+
+            % Fixation on top
+            Screen(w,'FillRect',fixcolor,fixRect+shrinkFix)
+            cueonT = Screen(w,'Flip');
+
+            sampleEye;
+
+            % Cue viewing period
+            while ((GetSecs - cueonT) < cueOn) && fixed
+
+                fixed = checkFix(origin, fix_err, space);
+
+                if ~fixed
+                    error_made = 1;
+                    errortype = 2; % broken fixation during cue
+                end
+
+            end
+        
+            % then turn off the cue
+            Screen(w,'FillRect',fixcolor,fixRect+shrinkFix)
+            cueoffT = Screen(w,'Flip');
             
-            if ~fixed
-                error_made = 1;
-                errortype = 2; % broken fixation during cue
+            % save the timings
+            cueOnTs(cue) = cueonT;
+            cueOffTs(cue) = cueoffT;
+            
+            % do a gap period
+            while ((GetSecs - cueoffT) < cueGap) && fixed
+                fixed = checkFix(origin, fix_err, space);
+
+                if ~fixed && ~error_made
+                    error_made = 1;
+                    errortype = 3; % broken fixation during overlap
+                end
             end
             
+            % up the count and go again
+            cue = cue + 1;
         end
-        
-        % then turn off the cue
-        Screen(w,'FillRect',fixcolor,fixRect+shrinkFix)
-        cueoffT = Screen(w,'Flip');
-    end
-    
-    if ~error_made && cueing % gap/memory period
-        while ((GetSecs - cueoffT) < targGap) && fixed
-            fixed = checkFix(origin, fix_err, space);
-            
-            if ~fixed && ~error_made
-                error_made = 1;
-                errortype = 3; % broken fixation during overlap
-            end
-        end
-        
     end
     
     if ~error_made % then it's time to put the targets on

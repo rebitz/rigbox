@@ -67,8 +67,25 @@ end
 iti = itimin + ((itimax - itimin) .* rand(1,1));
 fixHold = fixHoldMin + ((fixHoldMax - fixHoldMin) .* rand(1,1));
 cueOn = cueOnMin + ((cueOnMax - cueOnMin) .* rand(1,1));
-targGap = targGapMin + ((targGapMax - targGapMin) .* rand(1,1));
+cueGap = cueGapMin + ((cueGapMax - cueGapMin) .* rand(1,1));
 
+if cueing
+    % choose number of cues on this trial:
+    trialNCues = nCues(randi(length(nCues),1,1));
+    
+    % adjust fixation duration accordingly:
+    fixHold = fixHold-(cueOn+cueGap)*trialNCues;
+    
+    cueIds = randi(size(cueOpts,1),trialNCues,1);
+    cueColors = cueOpts(cueIds,:);
+    
+    cueOnTs = NaN(trialNCues,1);
+    cueOffTs = NaN(trialNCues,1);
+else
+    cueOnTs = NaN;
+    cueOffTs = NaN;
+end
+    
 % Performance/Error vars
 error_made = NaN;   % error flag
 errortype = NaN;    % type of error made (1 = brokefix, 2 = nochoice (t), 3 = brokechoice)

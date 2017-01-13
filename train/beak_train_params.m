@@ -42,7 +42,7 @@ rotateForJackpot = 1;
     
 pChoice = 100; % 0 = single target  
     
-% walk up the baground color to neutral gray
+% walk up the background color to neutral gray
 bgcolor = repmat(100,1,3);
 targcolor = repmat(255,1,3); % pre go, if not gabor
 targcolor2 = repmat(255,1,3); % post go, if not gabor
@@ -52,8 +52,8 @@ targcolor2 = repmat(255,1,3); % post go, if not gabor
 % tmp = [    0.6902    0.2506    0.2006;...
 %     0.0119    0.4219    0.5024].*255;
 
-tmp = [    0.9403    0.3526    0.4246;...
-    0.1016    0.5926    0.5181].*255;
+tmp = [    0.5220    0.4589    0.1726;...
+    0.3699    0.4335    0.8728].*255;
 
 % targcolor = pickColors(1)*255;
 % altTargColor = repmat(255,1,3);
@@ -62,13 +62,13 @@ targcolor = tmp(1,:);
 altTargColor = tmp(2,:);
 
 nDropsJuice = 1;
-juiceForLow = true;
+juiceForLow = false;
 juiceForAcq = false;
 juiceForFixed = false; % after overlap
     dropsForFixedSeed = [-0.5 1];
     noErrForFixed = true;
 %pJackpot = 0;
-jackpotMultiple = 4;
+jackpotMultiple = 5;
     pJackpot = .5; % jackpot likelihood on forced trials
     
 errorSecs = 0.2;
@@ -77,8 +77,8 @@ errorSecs = 0.2;
 targHoldTime = 0.08; % time to hold target fix
 penalizeShortRTTime = 0.03; % no acceptable RTs less than this number
 
-fixHoldMin = 0.24;%3;%24; % time to hold fixation
-fixHoldMax = 0.36;%5;%39;
+fixHoldMin = 0.27;%3;%24; % time to hold fixation
+fixHoldMax = 0.42;%5;%39;
 
 targOverlapMin = 0.05; % targ on before fix off t
 targOverlapMax = 0.11;
@@ -95,15 +95,15 @@ targSize = 2.5;
 if gaborTarg; targSize = 7; end % not implemented!!!
 
 % Allowable error
-fix_err = 4.5; % in dg was: 4.5
-targ_err = 6; % in dg
+fix_err = 6;%4.5; % in dg was: 4.5
+targ_err = 10;%6; % in dg
 
 % target locations
 nLoc = 2; % number of positions around the circle
 startAt = 15;
 nEcc = 1; % number of eccentricities
 thetas = [startAt:360/nLoc:360]; % evenly spaced (degrees)
-tOffsets = [5]; % targ offsets/eccentricities (degrees)
+tOffsets = 8;%[5]; % targ offsets/eccentricities (degrees)
 
 itimin = .28;
 itimax = .45;

@@ -9,14 +9,12 @@ nTargs = 3; % number of targets to put up simultaneously
 nLocs = 3; % number of possible locations to put them in
 nColors = nTargs*1; % quantize colorspace by???
 % 2x the number of targets seems to work well in mTurk
-nColors = round(nColors);
+nColors = round(nColors); % target options
+nProbeColors = 15;
 
 % pick a particular seed to start? just comment out to choose randomly
-seedSeed = 180;
+seedSeed = 270;
 nextSeed = 90;
-
-% cue one of the stimulus locations?
-cueing = 0; % JUST PUTS THE TARGS UP BEFORE THE GO
 
 % forced choice trials?
 pForced = 0.0;
@@ -26,7 +24,7 @@ forceBest = true; % else, force random choices
 keepOn = 1;
 
 % p(switch in reward anchor)
-hazard = 0.1; % this rides on top of the rwd buffer below
+hazard = 0.08; % this rides on top of the rwd buffer below
 % i.e. given rwdBuffer check OK, this is the hazard rate
 minJump = 45; % in dg
 
@@ -38,16 +36,20 @@ trSinceMin = trialsRequired;
 
 % reward distribution - check out illustrateColorSearchRwds to get a sense of this
 rwdStd = 10; % 30; % in degrees
-maxRwd = 1; % max rwd
-minRwd = .25; % min probability of rwd
+maxRwd = .95; % max rwd
+minRwd = .15; % min probability of rwd
 colorOrientations = 360/(nColors+1):360/(nColors+1):360;
 % make a lookup for the rwds, assign each color to some orientation
 
+% seed random
+rng('shuffle');
+
 % set up the colors of the targets
 %colorSeeds = pickColors(nColors);
-colorSeeds = [    0.0891    0.5564    0.4819;...
-    0.5189    0.3961    0.8037;...
-    0.7389    0.3923    0.1933];
+%colorSeeds = pickColorsFromOrientations(stimulusOrientations);
+colorSeeds = [    0.1107    0.5549    0.4332;...
+    0.4630    0.4097    0.8341;...
+    0.7737    0.3807    0.2056];
 
 % colorSeeds = [    0.0111    0.4197    0.5256;...
 %     0.5677    0.2564    0.5042;...
@@ -57,8 +59,8 @@ colorSeeds = colorSeeds .* 255;
 % Timing window parameters (s)
 time2fix = 5;
 time2choose = 2;
-fixHoldMin = 0.32;%6;%0.5;
-fixHoldMax = 0.55;%93;%0.7;
+fixHoldMin = 0.44;%6;%0.5;
+fixHoldMax = 0.76;%93;%0.7;
 targHoldTime = 0.19; % CAUTION!! WE NEED TO BRING THIS UP!
 
 % Inter-trial interval bounds (s)
@@ -66,13 +68,20 @@ postRewardTime = .5; % to keep collecting pupil size? % changed to +.95 on 11/8/
 itimin = 0.1;%.25;
 itimax = 0.3;%.75;
 
-% time for viewing the cue - NO CUE IS CURRENTLY IMPLEMENTED
-cueOnMin = .05;
-cueOnMax = .1;
+% cues/probe stimuli during fixation?
+cueing = 1; % JUST PUTS THE TARGS UP BEFORE THE GO
 
-% time between cue offset and target onset
-targGapMin = .1;
-targGapMax = .2;
+% timings and options for probes
+cueOpts = pickColors(nProbeColors)*255;
+%cueOrientations = 360/(nProbeColors+1):360/(nProbeColors+1):360;
+%cueOpts = pickColorsFromOrientation(cueOrientations);
+nCues = [1,2,3];
+cueOnMin = .09;
+cueOnMax = .09;
+
+% time between cue offset and cue/target onset
+cueGapMin = .16;
+cueGapMax = .31;
 
 % Background color
 bgcolor = [127 127 127];

@@ -23,7 +23,7 @@ trials.cueOffT = cueoffT;
 trials.whichCued = whichCued;
 
 % Target timings
-trials.targGap = targGap; % time after cue
+trials.cueGap = cueGap; % time after cue
 trials.targOn = targon;
 trials.targOff = targoff;
 trials.targAcq = targacq;
@@ -36,6 +36,14 @@ trials.targOrigins = targOrigin;
 trials.targColors = theseColors;
 trials.targSlots = targSlots;
 trials.targIndex = targIndx;
+
+% probe stimulus information:
+trials.nProbes = trialNCues;
+trials.cueIds = cueIds;
+%trials.cueOrienations = cueOrientations(cueIds);
+trials.cueColors = cueColors;
+trials.cueOnTs = cueOnTs;
+trials.cueOffTs = cueOffTs;
 
 % reward information
 trials.targRadDistance = angDist; % in radians
